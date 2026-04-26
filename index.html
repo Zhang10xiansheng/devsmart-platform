@@ -2,279 +2,163 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DevSmart v3.0 · 职业化学习平台</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>DevSmart v4.0 · 职业化学习平台</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     :root {
       --bg: #0b0f17;
-      --card: #151b26;
+      --glass: rgba(21, 27, 38, 0.65);
       --border: #253349;
       --blue: #3b82f6;
       --text: #e2e8f0;
       --muted: #94a3b8;
-      --radius: 12px;
+      --radius: 14px;
       --green: #10b981;
       --orange: #f59e0b;
       --purple: #8b5cf6;
-      --sidebar-width: 270px;
+      --sidebar-width: 260px;
+      --topbar-height: 60px;
+      --transition: 0.2s ease;
     }
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:var(--bg); color:var(--text); font-family: system-ui, -apple-system, sans-serif; height:100vh; display:flex; }
+    body { background:var(--bg); color:var(--text); font-family: 'Inter', system-ui, -apple-system, sans-serif; height:100vh; display:flex; overflow:hidden; }
     .hidden { display:none !important; }
 
     /* 侧边栏 */
     .sidebar {
-      width: var(--sidebar-width); background: #0f1520; border-right:1px solid var(--border);
-      display:flex; flex-direction:column; padding:24px 16px; flex-shrink:0;
+      width: var(--sidebar-width); background: rgba(15, 21, 32, 0.9); backdrop-filter: blur(12px);
+      border-right:1px solid var(--border); display:flex; flex-direction:column; padding:24px 16px; flex-shrink:0;
     }
     .user-section { display:flex; align-items:center; gap:12px; margin-bottom:24px; }
-    .user-avatar { width:48px; height:48px; border-radius:50%; background:var(--blue); }
-    .user-info { flex:1; min-width:0; }
-    .user-info .name { font-weight:600; font-size:16px; }
-    .user-info .status { font-size:12px; color:var(--muted); }
-    .login-btn { width:100%; padding:10px; background:var(--card); border:1px solid var(--border); border-radius:8px; color:var(--text); cursor:pointer; }
+    .user-avatar { width:44px; height:44px; border-radius:50%; background:var(--blue); }
+    .user-info .name { font-weight:600; }
+    .user-info .status { font-size:11px; color:var(--muted); }
+    .login-btn { width:100%; padding:10px; background:var(--glass); border:1px solid var(--border); border-radius:10px; color:var(--text); cursor:pointer; transition:var(--transition); }
+    .login-btn:hover { background:#1e293b; }
     .nav-item {
-      display:flex; align-items:center; gap:12px; padding:12px 16px; margin:4px 0;
-      border-radius:8px; cursor:pointer; color:var(--muted); text-decoration:none; font-size:15px;
+      display:flex; align-items:center; gap:12px; padding:12px 14px; margin:2px 0;
+      border-radius:10px; cursor:pointer; color:var(--muted); text-decoration:none; font-size:14px; transition:var(--transition);
     }
-    .nav-item i { width:20px; font-size:16px; }
-    .nav-item:hover, .nav-item.active { background:#1e293b; color:#fff; }
+    .nav-item i { width:20px; font-size:15px; }
+    .nav-item:hover, .nav-item.active { background:#1e293b; color:#fff; transform: translateX(4px); }
 
     /* 主界面 */
-    .main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+    .main { flex:1; display:flex; flex-direction:column; min-width:0; }
     .topbar {
-      padding:12px 24px; background:#0f1520; border-bottom:1px solid var(--border);
-      display:flex; align-items:center; gap:16px;
+      height: var(--topbar-height); padding:0 24px; background: rgba(15, 21, 32, 0.8); backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px; flex-shrink:0;
     }
-    .mode-switch { display:flex; background:var(--card); border-radius:30px; padding:4px; }
-    .mode-btn {
-      padding:8px 24px; border-radius:26px; cursor:pointer; font-size:14px;
-      border:none; background:transparent; color:var(--muted);
+    .mode-switch, .role-switch { display:flex; background:var(--glass); border-radius:30px; padding:4px; gap:4px; }
+    .mode-btn, .role-btn {
+      padding:8px 20px; border-radius:26px; cursor:pointer; font-size:13px;
+      border:none; background:transparent; color:var(--muted); transition:var(--transition);
     }
-    .mode-btn.active { background:var(--blue); color:#fff; }
+    .mode-btn.active, .role-btn.active { background:var(--blue); color:#fff; font-weight:600; }
     .btn {
-      background:var(--blue); color:#fff; border:none; padding:8px 20px;
+      background:var(--blue); color:#fff; border:none; padding:8px 18px;
       border-radius:8px; cursor:pointer; font-size:14px; display:inline-flex; align-items:center; gap:6px;
+      transition:var(--transition);
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
     }
     .btn-outline { background:transparent; border:1px solid var(--border); color:var(--text); }
-    .btn-sm { padding:6px 14px; font-size:13px; }
-    .content-scroll { flex:1; overflow-y:auto; padding:24px; }
+    .btn-sm { padding:6px 14px; font-size:12px; }
+    .content-scroll { flex:1; overflow-y:auto; padding:24px; display:flex; flex-direction:column; gap:20px; }
     .page { display:none; }
     .page.active { display:block; }
     .card {
-      background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
-      padding:24px; margin-bottom:20px;
+      background: var(--glass); backdrop-filter: blur(8px); border:1px solid var(--border);
+      border-radius:var(--radius); padding:24px;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
     .toast {
       position:fixed; top:24px; right:24px; background:var(--blue);
       color:#fff; padding:14px 24px; border-radius:10px; z-index:9999;
+      animation: slideIn 0.3s ease;
     }
+    @keyframes slideIn { from { transform: translateX(100px); opacity:0; } to { transform: translateX(0); opacity:1; } }
+
     .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:20px; }
     .progress-bar { height:10px; background:var(--border); border-radius:8px; overflow:hidden; }
-    .progress-fill { height:100%; border-radius:8px; background:var(--blue); }
-    .role-selector { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
-    .role-btn { padding:8px 18px; border-radius:20px; border:1px solid var(--border); background:transparent; color:var(--text); cursor:pointer; }
-    .role-btn.active { background:var(--blue); border-color:var(--blue); }
-    .level-selector { display:flex; gap:8px; margin-bottom:16px; }
-    .level-btn { padding:6px 16px; border-radius:6px; cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--text); }
-    .level-btn.active { background:var(--purple); border-color:var(--purple); }
-    .exam-question { margin-bottom:20px; }
-    .exam-option {
-      display:block; padding:10px 16px; margin:6px 0; border-radius:8px;
-      cursor:pointer; border:1px solid var(--border); background:transparent;
-    }
-    .exam-option.selected { border-color:var(--blue); background:rgba(59,130,246,0.1); }
-    .task-step {
-      padding:12px 16px; border-left:3px solid var(--blue); background:#1e293b;
-      margin:8px 0; border-radius:6px; display:flex; align-items:center; gap:12px;
+    .progress-fill { height:100%; border-radius:8px; background:var(--blue); transition: width 0.5s; }
+    .flex-row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .tag {
+      padding:4px 10px; border-radius:20px; font-size:11px; background:rgba(59,130,246,0.15); color:#60a5fa;
     }
     .forum-post { padding:12px; border-bottom:1px solid var(--border); }
+    .task-step { padding:12px 16px; border-left:3px solid var(--blue); background:#1e293b; margin:8px 0; border-radius:8px; }
+    .exam-option { display:block; padding:10px 16px; margin:6px 0; border-radius:8px; cursor:pointer; border:1px solid var(--border); }
+    .exam-option.selected { border-color:var(--blue); background:rgba(59,130,246,0.1); }
+    input, textarea, select {
+      background: rgba(11, 17, 25, 0.8); border:1px solid var(--border); border-radius:8px;
+      padding:10px 14px; color:var(--text); font-family:inherit; outline:none;
+    }
   </style>
 </head>
 <body>
 
-<!-- 侧边栏 -->
-<aside class="sidebar">
-  <div class="user-section" id="userSection">
-    <img class="user-avatar" id="userAvatar" src="https://via.placeholder.com/48" alt="">
+<aside class="sidebar" id="sidebarContainer">
+  <div class="user-section">
+    <img class="user-avatar" id="userAvatar" src="https://via.placeholder.com/44" alt="">
     <div class="user-info">
       <div class="name" id="userName">未登录</div>
-      <div class="status" id="userStatus">请设置 Token</div>
+      <div class="status" id="userStatus">设置 Token</div>
     </div>
   </div>
-  <button class="login-btn" id="loginBtn"><i class="fa-brands fa-github"></i> 使用 GitHub Token 登录</button>
-  <nav style="margin-top: 24px; flex:1;">
-    <a class="nav-item active" data-page="dashboard"><i class="fa-solid fa-chart-pie"></i> 仪表盘</a>
-    <a class="nav-item" data-page="learn"><i class="fa-solid fa-graduation-cap"></i> 学习中心</a>
-    <a class="nav-item" data-page="work"><i class="fa-solid fa-briefcase"></i> 模拟上班</a>
-    <a class="nav-item" data-page="exam"><i class="fa-solid fa-file-circle-check"></i> AI 考试</a>
-    <a class="nav-item" data-page="practice"><i class="fa-solid fa-laptop-code"></i> 项目实操</a>
-    <a class="nav-item" data-page="forum"><i class="fa-solid fa-comments"></i> 论坛</a>
-    <a class="nav-item" data-page="tools"><i class="fa-solid fa-toolbox"></i> 工具箱</a>
-  </nav>
-  <div style="font-size:12px; color:var(--muted);">v3.0 · 职业分级平台</div>
+  <button class="login-btn" id="loginBtn"><i class="fa-brands fa-github"></i> GitHub 登录</button>
+  <nav id="sidebarNav" style="margin-top: 20px;"></nav>
+  <div style="margin-top:auto; font-size:11px; color:var(--muted);">v4.0 · 职业化</div>
 </aside>
 
-<!-- 主区域 -->
 <div class="main">
   <header class="topbar">
     <div class="mode-switch" id="modeSwitch">
-      <button class="mode-btn active" data-mode="learn">🎓 学习模式</button>
-      <button class="mode-btn" data-mode="work">💼 上班模式</button>
+      <button class="mode-btn active" data-mode="learn">🎓 学习</button>
+      <button class="mode-btn" data-mode="work">💼 上班</button>
     </div>
-    <div id="currentModeLabel" style="color:var(--muted);">当前：学习模式</div>
-    <div style="margin-left:auto; display:flex; gap:12px;">
-      <button class="btn btn-outline btn-sm" id="configBtn"><i class="fa-solid fa-gear"></i> 设置</button>
+    <div class="role-switch" id="roleSwitch">
+      <button class="role-btn active" data-role="fullstack">全栈</button>
+      <button class="role-btn" data-role="sdet">测开</button>
+      <button class="role-btn" data-role="qa">测试</button>
+      <button class="role-btn" data-role="ai-test">AI测试</button>
+    </div>
+    <div style="margin-left:auto; display:flex; gap:8px;">
+      <button class="btn btn-outline btn-sm" id="configBtn"><i class="fa-solid fa-gear"></i></button>
     </div>
   </header>
 
-  <div class="content-scroll">
-    <!-- 仪表盘 -->
-    <div class="page active" id="page-dashboard">
-      <h2>📊 仪表盘</h2>
-      <div class="card">
-        <h3>📈 学习路线图 · <span id="dashboardRoleLabel">全栈开发</span> (<span id="dashboardLevelLabel">初级</span>)</h3>
-        <div id="roadmapContainer"></div>
-      </div>
-      <div class="grid-2">
-        <div class="card">
-          <h4>⏳ 本周学习</h4>
-          <div style="font-size:28px; font-weight:bold;">8.5h</div>
-          <div>完成项目：3 个</div>
-        </div>
-        <div class="card">
-          <h4>🤖 AI 老师</h4>
-          <textarea id="aiTeacherCode" style="width:100%; height:100px; background:#0b1119; color:var(--text); border:1px solid var(--border); border-radius:8px; padding:12px; font-family:monospace;" placeholder="粘贴代码让 AI 分析错误..."></textarea>
-          <button class="btn btn-sm" onclick="analyzeCode()" style="margin-top:8px;">🔍 分析</button>
-          <div id="aiTeacherOutput" style="margin-top:8px; padding:12px; background:#0b1119; border-radius:8px; white-space:pre-wrap; max-height:200px; overflow-y:auto;"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 学习中心 -->
-    <div class="page" id="page-learn">
-      <h2>🎓 学习中心</h2>
-      <div class="grid-2">
-        <div class="card">
-          <h4>📺 课程视频</h4>
-          <div class="flex-row" style="margin-bottom:12px;">
-            <input type="text" id="videoSearchInput" placeholder="搜索关键词" style="flex:1; padding:8px; background:#0b1119; border:1px solid var(--border); border-radius:6px; color:var(--text);">
-            <button class="btn btn-sm" onclick="searchCourse()">搜索</button>
-          </div>
-          <div id="courseList" style="max-height:200px; overflow-y:auto;"></div>
-          <iframe id="videoPlayer" style="height:280px; margin-top:12px;" src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen></iframe>
-        </div>
-        <div class="card">
-          <h4>💻 跟随练习</h4>
-          <textarea id="learnCodeEditor" style="width:100%; height:220px; background:#0b1119; color:var(--text); border:1px solid var(--border); border-radius:8px; padding:12px; font-family:monospace;">// 在这里编写练习代码</textarea>
-          <div class="flex-row" style="margin-top:8px;">
-            <select id="learnLangSelect" style="padding:6px; background:#0b1119; border:1px solid var(--border); border-radius:6px; color:var(--text);">
-              <option value="javascript">JavaScript</option>
-              <option value="python3">Python 3</option>
-            </select>
-            <button class="btn btn-sm" onclick="runLearnCode()">🚀 运行</button>
-          </div>
-          <div id="learnCodeOutput" style="margin-top:8px; padding:12px; background:#0b1119; border-radius:8px; font-family:monospace; white-space:pre-wrap;"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 模拟上班 -->
-    <div class="page" id="page-work">
-      <h2>💼 模拟上班</h2>
-      <div class="role-selector" id="roleSelector">
-        <button class="role-btn active" data-role="sdet">测试开发</button>
-        <button class="role-btn" data-role="qa">测试工程师</button>
-        <button class="role-btn" data-role="fullstack">全栈开发</button>
-        <button class="role-btn" data-role="ai-test">AI测试</button>
-      </div>
-      <div class="level-selector" id="workLevelSelector">
-        <button class="level-btn active" data-level="junior">初级</button>
-        <button class="level-btn" data-level="middle">中级</button>
-        <button class="level-btn" data-level="senior">高级</button>
-      </div>
-      <div class="card">
-        <h4 id="workTaskTitle">今日任务 · 测试开发 (初级)</h4>
-        <div id="workTaskList"></div>
-        <button class="btn btn-sm" onclick="generateWorkTasks()">🔄 重新生成</button>
-      </div>
-    </div>
-
-    <!-- AI 考试 -->
-    <div class="page" id="page-exam">
-      <h2>📝 AI 考试</h2>
-      <div class="card">
-        <div class="flex-row" style="margin-bottom:16px;">
-          <span style="font-weight:600;">当前职业：<span id="examRoleLabel">测试开发</span> · 等级：<span id="examLevelLabel">初级</span></span>
-          <button class="btn btn-sm" onclick="startExam()">🎲 生成试卷</button>
-        </div>
-        <div id="examPaper"></div>
-        <div id="examScore" style="margin-top:16px; font-weight:bold;"></div>
-      </div>
-    </div>
-
-    <!-- 项目实操 -->
-    <div class="page" id="page-practice">
-      <h2>🛠 项目实操</h2>
-      <div class="card">
-        <div class="flex-row" style="margin-bottom:16px;">
-          <span>根据 <strong><span id="practiceRoleLabel">测试开发</span> · <span id="practiceLevelLabel">初级</span></strong> 生成项目</span>
-          <button class="btn btn-sm" onclick="generatePracticeProject()">✨ 生成新项目</button>
-        </div>
-        <div id="projectSteps"></div>
-      </div>
-    </div>
-
-    <!-- 论坛 -->
-    <div class="page" id="page-forum">
-      <h2>💬 开发者论坛</h2>
-      <div class="card">
-        <textarea id="newPost" placeholder="分享你的想法..." style="width:100%; height:80px; background:#0b1119; color:var(--text); border:1px solid var(--border); border-radius:8px; padding:12px;"></textarea>
-        <button class="btn btn-sm" onclick="addPost()" style="margin-top:8px;">发布</button>
-      </div>
-      <div id="forumPosts" style="margin-top:16px;"></div>
-    </div>
-
-    <!-- 工具箱 -->
-    <div class="page" id="page-tools">
-      <h2>👑 小公举工具箱</h2>
-      <div class="flex-row" style="margin-bottom:16px;">
-        <button class="btn btn-sm" onclick="showTool('json')">📋 JSON</button>
-        <button class="btn btn-sm" onclick="showTool('color')">🎨 颜色</button>
-        <button class="btn btn-sm" onclick="showTool('timestamp')">⏱ 时间戳</button>
-      </div>
-      <div id="toolArea"></div>
-    </div>
+  <div class="content-scroll" id="contentArea">
+    <!-- 动态页面将由 JS 渲染，此处仅作为占位 -->
   </div>
 </div>
 
-<!-- 设置 & 登录面板 -->
-<div class="hidden" id="configPanel" style="position:fixed; top:60px; right:20px; width:320px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:24px; z-index:999;">
+<div id="configPanel" class="hidden" style="position:fixed; top:70px; right:20px; width:320px; background:var(--glass); backdrop-filter:blur(12px); border:1px solid var(--border); border-radius:16px; padding:24px; z-index:99;">
   <span style="position:absolute; top:12px; right:16px; cursor:pointer;" onclick="document.getElementById('configPanel').classList.add('hidden')">✕</span>
-  <h4>🔑 设置 & 登录</h4>
+  <h4>🔑 设置</h4>
   <label>GitHub Token</label>
-  <input type="password" id="ghToken" placeholder="ghp_xxx" style="width:100%; padding:8px; background:#0b1119; border:1px solid var(--border); color:var(--text); margin-bottom:12px;">
-  <label>YouTube API Key</label>
-  <input type="password" id="ytKey" placeholder="AIza... (可选)" style="width:100%; padding:8px; background:#0b1119; border:1px solid var(--border); color:var(--text); margin-bottom:12px;">
-  <button class="btn" onclick="saveAndLogin()" style="width:100%;">💾 保存并登录</button>
+  <input type="password" id="ghToken" placeholder="ghp_...">
+  <label>YouTube Key</label>
+  <input type="password" id="ytKey" placeholder="AIza...">
+  <button class="btn" onclick="saveAndLogin()" style="width:100%; margin-top:12px;">💾 保存</button>
 </div>
 
 <div id="toastContainer"></div>
 
 <script>
-  // ======================== 全局状态 ========================
+  // ====================== 全局状态 ======================
   const state = {
     mode: 'learn',           // learn / work
-    role: 'sdet',            // 职业
-    level: 'junior',         // 等级
-    user: null,              // GitHub 用户信息
+    role: 'fullstack',       // fullstack, sdet, qa, ai-test
+    level: 'junior',         // junior / middle / senior (等级可在学习路线中使用)
+    user: null,
+    currentPage: 'dashboard'
   };
 
-  const CONFIG_KEY = 'ds_config_v3';
+  const CONFIG_KEY = 'ds_config_v4';
   let config = { githubToken: '', youtubeKey: '' };
 
-  // ======================== 初始化 ========================
+  // ====================== 初始化 ======================
   function loadConfig() {
     const saved = localStorage.getItem(CONFIG_KEY);
     if (saved) config = JSON.parse(saved);
@@ -292,14 +176,8 @@
       if (res.ok) {
         state.user = await res.json();
         updateUserUI();
-      } else {
-        state.user = null;
-        updateUserUI();
       }
-    } catch (e) {
-      state.user = null;
-      updateUserUI();
-    }
+    } catch (e) {}
   }
 
   function updateUserUI() {
@@ -311,16 +189,19 @@
       avatar.src = state.user.avatar_url;
       name.textContent = state.user.login;
       status.textContent = '已登录';
-      loginBtn.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i> 切换账号';
+      loginBtn.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i> 切换';
     } else {
-      avatar.src = 'https://via.placeholder.com/48';
+      avatar.src = 'https://via.placeholder.com/44';
       name.textContent = '未登录';
-      status.textContent = '请设置 Token';
-      loginBtn.innerHTML = '<i class="fa-brands fa-github"></i> 使用 GitHub Token 登录';
+      status.textContent = '设置 Token';
+      loginBtn.innerHTML = '<i class="fa-brands fa-github"></i> GitHub 登录';
     }
   }
 
   document.getElementById('loginBtn').addEventListener('click', () => {
+    document.getElementById('configPanel').classList.toggle('hidden');
+  });
+  document.getElementById('configBtn').addEventListener('click', () => {
     document.getElementById('configPanel').classList.toggle('hidden');
   });
 
@@ -328,293 +209,464 @@
     config.githubToken = document.getElementById('ghToken').value.trim();
     config.youtubeKey = document.getElementById('ytKey').value.trim();
     localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
-    toast('配置已保存');
     await fetchGitHubUser();
     document.getElementById('configPanel').classList.add('hidden');
+    toast('配置已保存');
   }
 
-  document.getElementById('configBtn').addEventListener('click', () => {
-    document.getElementById('configPanel').classList.toggle('hidden');
-  });
-
-  // ======================== 模式 / 职业 / 等级切换 ========================
-  document.getElementById('modeSwitch').addEventListener('click', (e) => {
-    const btn = e.target.closest('.mode-btn');
-    if (!btn) return;
-    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    state.mode = btn.dataset.mode;
-    document.getElementById('currentModeLabel').textContent = `当前：${state.mode==='work'?'上班模式':'学习模式'}`;
-    updateDashboardInfo();
-  });
-
-  document.querySelectorAll('.role-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
-      this.classList.add('active');
-      state.role = this.dataset.role;
-      updateDashboardInfo();
-      updateWorkTaskTitle();
-      updateExamLabels();
-      updatePracticeLabels();
-    });
-  });
-
-  document.querySelectorAll('.level-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
-      this.classList.add('active');
-      state.level = this.dataset.level;
-      updateDashboardInfo();
-      updateWorkTaskTitle();
-      updateExamLabels();
-      updatePracticeLabels();
-    });
-  });
-
-  function updateDashboardInfo() {
-    const roleMap = { sdet:'测试开发', qa:'测试工程师', fullstack:'全栈开发', 'ai-test':'AI测试' };
-    const levelMap = { junior:'初级', middle:'中级', senior:'高级' };
-    document.getElementById('dashboardRoleLabel').textContent = roleMap[state.role];
-    document.getElementById('dashboardLevelLabel').textContent = levelMap[state.level];
-    generateRoadmap();
-  }
-
-  function updateWorkTaskTitle() {
-    const roleMap = { sdet:'测试开发', qa:'测试工程师', fullstack:'全栈开发', 'ai-test':'AI测试' };
-    const levelMap = { junior:'初级', middle:'中级', senior:'高级' };
-    document.getElementById('workTaskTitle').textContent = `今日任务 · ${roleMap[state.role]} (${levelMap[state.level]})`;
-  }
-
-  function updateExamLabels() {
-    const roleMap = { sdet:'测试开发', qa:'测试工程师', fullstack:'全栈开发', 'ai-test':'AI测试' };
-    const levelMap = { junior:'初级', middle:'中级', senior:'高级' };
-    document.getElementById('examRoleLabel').textContent = roleMap[state.role];
-    document.getElementById('examLevelLabel').textContent = levelMap[state.level];
-  }
-
-  function updatePracticeLabels() {
-    const roleMap = { sdet:'测试开发', qa:'测试工程师', fullstack:'全栈开发', 'ai-test':'AI测试' };
-    const levelMap = { junior:'初级', middle:'中级', senior:'高级' };
-    document.getElementById('practiceRoleLabel').textContent = roleMap[state.role];
-    document.getElementById('practiceLevelLabel').textContent = levelMap[state.level];
-  }
-
-  // ======================== 仪表盘路线图 ========================
-  function generateRoadmap() {
-    const container = document.getElementById('roadmapContainer');
-    const roleMap = {
-      sdet: ['自动化测试基础', 'CI/CD 集成', '性能测试'],
-      qa: ['测试用例设计', '缺陷管理', '回归测试'],
-      fullstack: ['前端基础', '后端 API', '数据库设计'],
-      'ai-test': ['AI 模型评估', '测试数据生成', '自动化测试框架']
-    };
-    const levels = ['junior', 'middle', 'senior'];
-    const currentIdx = levels.indexOf(state.level);
-    const steps = roleMap[state.role];
-    let html = '<div style="display:flex; gap:12px; flex-wrap:wrap;">';
-    steps.forEach((step, idx) => {
-      const isDone = idx <= currentIdx;
-      html += `<div style="padding:12px 20px; background:${isDone?'var(--blue)':'#1e293b'}; border-radius:8px; color:white;">${step}</div>`;
-    });
-    html += '</div>';
-    container.innerHTML = html;
-  }
-
-  // ======================== AI 老师 ========================
-  async function analyzeCode() {
-    const code = document.getElementById('aiTeacherCode').value.trim();
-    if (!code) return toast('请粘贴代码');
-    if (!config.githubToken) return toast('请先配置 GitHub Token');
-    const out = document.getElementById('aiTeacherOutput');
-    out.textContent = 'AI 分析中...';
-    try {
-      const res = await fetch('https://models.github.ai/inference/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.githubToken}` },
-        body: JSON.stringify({
-          model: 'gpt-4o',
-          messages: [{ role: 'user', content: `作为编程导师，请分析以下代码的错误和优化建议，用中文友好回复：\n${code}` }],
-          max_tokens: 500
-        })
-      });
-      const data = await res.json();
-      out.textContent = data.choices?.[0]?.message?.content || '分析失败';
-    } catch (e) {
-      out.textContent = '网络错误';
-    }
-  }
-
-  // ======================== 视频搜索 ========================
-  async function searchCourse() {
-    if (!config.youtubeKey) return toast('请先配置 YouTube API Key');
-    const query = document.getElementById('videoSearchInput').value.trim();
-    if (!query) return;
-    const list = document.getElementById('courseList');
-    list.innerHTML = '搜索中...';
-    try {
-      const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=5&q=${encodeURIComponent(query)}+programming&type=video&key=${config.youtubeKey}`);
-      const data = await res.json();
-      list.innerHTML = data.items?.map(v => `<div style="padding:6px; cursor:pointer;" onclick="document.getElementById('videoPlayer').src='https://www.youtube.com/embed/${v.id.videoId}'">${v.snippet.title}</div>`).join('') || '无结果';
-    } catch (e) { list.innerHTML = '搜索失败'; }
-  }
-
-  // ======================== 学习代码运行 ========================
-  function runLearnCode() {
-    const code = document.getElementById('learnCodeEditor').value;
-    const out = document.getElementById('learnCodeOutput');
-    out.textContent = `[前端模拟运行]\n${code}`;
-  }
-
-  // ======================== 上班任务生成 ========================
-  async function generateWorkTasks() {
-    if (!config.githubToken) return toast('请先配置 GitHub Token');
-    const roleMap = { sdet:'测试开发', qa:'测试工程师', fullstack:'全栈开发', 'ai-test':'AI测试' };
-    const roleName = roleMap[state.role];
-    const levelMap = { junior:'初级', middle:'中级', senior:'高级' };
-    const levelName = levelMap[state.level];
-    document.getElementById('workTaskList').innerHTML = 'AI 生成中...';
-    try {
-      const res = await fetch('https://models.github.ai/inference/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.githubToken}` },
-        body: JSON.stringify({
-          model: 'gpt-4o',
-          messages: [{ role: 'user', content: `你是一名${roleName}（${levelName}）的技术主管，请为今天安排4项具体工作，用JSON数组：[{"title":"任务标题","desc":"详细描述"}]` }],
-          max_tokens: 600
-        })
-      });
-      const data = await res.json();
-      const tasks = JSON.parse(data.choices[0].message.content.replace(/```json|```/g, '').trim());
-      document.getElementById('workTaskList').innerHTML = tasks.map(t => `<div class="task-step"><strong>${t.title}</strong><p>${t.desc}</p></div>`).join('');
-    } catch (e) { document.getElementById('workTaskList').innerHTML = '生成失败，请重试'; }
-  }
-
-  // ======================== AI 考试 ========================
-  async function startExam() {
-    if (!config.githubToken) return toast('请先配置 GitHub Token');
-    const roleMap = { sdet:'测试开发', qa:'测试工程师', fullstack:'全栈开发', 'ai-test':'AI测试' };
-    const topic = `${roleMap[state.role]} (${state.level})`;
-    document.getElementById('examPaper').innerHTML = '生成试卷中...';
-    try {
-      const res = await fetch('https://models.github.ai/inference/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.githubToken}` },
-        body: JSON.stringify({
-          model: 'gpt-4o',
-          messages: [{ role: 'user', content: `生成关于“${topic}”的3道单选题，JSON：[{"q":"题目","options":["A","B","C","D"],"answer":0}]` }],
-          max_tokens: 600
-        })
-      });
-      const data = await res.json();
-      const questions = JSON.parse(data.choices[0].message.content.replace(/```json|```/g, '').trim());
-      window.currentExam = questions;
-      let html = '';
-      questions.forEach((q, i) => {
-        html += `<div class="exam-question"><strong>${i+1}. ${q.q}</strong>`;
-        q.options.forEach((opt, oi) => {
-          html += `<div class="exam-option" data-q="${i}" data-o="${oi}" onclick="selectOption(this)">${String.fromCharCode(65+oi)}. ${opt}</div>`;
-        });
-        html += `</div>`;
-      });
-      html += '<button class="btn btn-sm" onclick="submitExam()">提交答卷</button>';
-      document.getElementById('examPaper').innerHTML = html;
-    } catch (e) { document.getElementById('examPaper').innerHTML = '生成失败'; }
-  }
-  function selectOption(el) {
-    el.parentElement.querySelectorAll('.exam-option').forEach(o => o.classList.remove('selected'));
-    el.classList.add('selected');
-  }
-  function submitExam() {
-    let score = 0;
-    document.querySelectorAll('.exam-question').forEach((q, i) => {
-      const sel = q.querySelector('.exam-option.selected');
-      if (sel && parseInt(sel.dataset.o) === window.currentExam[i].answer) score++;
-    });
-    document.getElementById('examScore').textContent = `得分：${score}/${window.currentExam.length}`;
-  }
-
-  // ======================== 项目实操 ========================
-  async function generatePracticeProject() {
-    if (!config.githubToken) return toast('请先配置 GitHub Token');
-    const roleMap = { sdet:'测试开发', qa:'测试工程师', fullstack:'全栈开发', 'ai-test':'AI测试' };
-    const topic = `${roleMap[state.role]} (${state.level})`;
-    document.getElementById('projectSteps').innerHTML = 'AI 生成项目中...';
-    try {
-      const res = await fetch('https://models.github.ai/inference/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.githubToken}` },
-        body: JSON.stringify({
-          model: 'gpt-4o',
-          messages: [{ role: 'user', content: `为“${topic}”设计一个跟随式实操项目，包含5个步骤，JSON数组：[{"step":1,"title":"步骤标题","desc":"步骤描述"}]` }],
-          max_tokens: 600
-        })
-      });
-      const data = await res.json();
-      const steps = JSON.parse(data.choices[0].message.content.replace(/```json|```/g, '').trim());
-      document.getElementById('projectSteps').innerHTML = steps.map(s => `<div class="task-step"><strong>${s.step}. ${s.title}</strong><p>${s.desc}</p></div>`).join('');
-    } catch (e) { document.getElementById('projectSteps').innerHTML = '生成失败'; }
-  }
-
-  // ======================== 论坛 ========================
-  function addPost() {
-    const text = document.getElementById('newPost').value.trim();
-    if (!text) return;
-    const posts = JSON.parse(localStorage.getItem('forum_posts') || '[]');
-    posts.push({ text, time: new Date().toLocaleString(), user: state.user?.login || '匿名' });
-    localStorage.setItem('forum_posts', JSON.stringify(posts));
-    document.getElementById('newPost').value = '';
-    renderForum();
-  }
-  function renderForum() {
-    const posts = JSON.parse(localStorage.getItem('forum_posts') || '[]');
-    document.getElementById('forumPosts').innerHTML = posts.map(p => `<div class="forum-post"><strong>${p.user}</strong> · ${p.time}<p>${p.text}</p></div>`).join('');
-  }
-
-  // ======================== 工具箱 ========================
-  function showTool(name) {
-    const a = document.getElementById('toolArea');
-    if (name === 'json') {
-      a.innerHTML = `<textarea id="jsonInput" style="width:100%;height:120px;background:#0b1119;color:var(--text);border:1px solid var(--border);">{"key":"value"}</textarea>
-        <button class="btn btn-sm" onclick="formatJson()">格式化</button> <button class="btn btn-sm" onclick="compressJson()">压缩</button>
-        <pre id="jsonOutput" style="margin-top:8px; padding:12px; background:#0b1119;"></pre>`;
-      window.formatJson = () => { try { const o = JSON.parse(document.getElementById('jsonInput').value); document.getElementById('jsonOutput').textContent = JSON.stringify(o, null, 2); } catch (e) { document.getElementById('jsonOutput').textContent = '无效 JSON'; } };
-      window.compressJson = () => { try { const o = JSON.parse(document.getElementById('jsonInput').value); document.getElementById('jsonOutput').textContent = JSON.stringify(o); } catch (e) { document.getElementById('jsonOutput').textContent = '无效 JSON'; } };
-    } else if (name === 'color') {
-      a.innerHTML = `<input type="text" id="hexInput" placeholder="#3b82f6"><button onclick="convertColor()">转换</button><input type="text" id="rgbOutput" readonly>`;
-      window.convertColor = () => { const h = document.getElementById('hexInput').value; const m = /^#?([a-f\d]{6})$/i.exec(h); if(m) { const r = parseInt(m[1].substr(0,2),16); const g = parseInt(m[1].substr(2,2),16); const b = parseInt(m[1].substr(4,2),16); document.getElementById('rgbOutput').value = `rgb(${r},${g},${b})`; } };
-    } else if (name === 'timestamp') {
-      a.innerHTML = `<input type="text" id="tsInput" placeholder="时间戳"><button onclick="convertTimestamp()">转换</button><input type="text" id="dateOutput" readonly>`;
-      window.convertTimestamp = () => { const ts = parseInt(document.getElementById('tsInput').value); if(!isNaN(ts)) document.getElementById('dateOutput').value = new Date(ts*1000).toLocaleString(); };
-    }
-  }
-
-  // ======================== 通用 ========================
   function toast(msg) {
     const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
     document.getElementById('toastContainer').appendChild(t);
     setTimeout(() => t.remove(), 3000);
   }
 
-  // 页面导航
-  document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', (e) => {
-      e.preventDefault();
-      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-      item.classList.add('active');
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.getElementById('page-' + item.dataset.page).classList.add('active');
-    });
+  // ====================== 模式/职业切换 ======================
+  document.getElementById('modeSwitch').addEventListener('click', (e) => {
+    const btn = e.target.closest('.mode-btn');
+    if (!btn) return;
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.mode = btn.dataset.mode;
+    renderSidebar();
+    navigateTo(defaultPage());
   });
 
-  // 启动
+  document.getElementById('roleSwitch').addEventListener('click', (e) => {
+    const btn = e.target.closest('.role-btn');
+    if (!btn) return;
+    document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.role = btn.dataset.role;
+    // 职业变化可能影响当前页面数据，重新渲染当前页
+    renderCurrentPage();
+  });
+
+  function defaultPage() {
+    return state.mode === 'learn' ? 'learncenter' : 'workcheckin';
+  }
+
+  function navigateTo(page) {
+    state.currentPage = page;
+    renderCurrentPage();
+  }
+
+  function renderCurrentPage() {
+    const container = document.getElementById('contentArea');
+    container.innerHTML = ''; // 简单重建，后续可组件化
+    const page = state.currentPage;
+    switch (page) {
+      case 'dashboard': renderDashboard(container); break;
+      case 'learncenter': renderLearnCenter(container); break;
+      case 'aiexam': renderAIExam(container); break;
+      case 'forum': renderForum(container); break;
+      case 'tools': renderTools(container); break;
+      case 'roadmap': renderRoadmapPage(container); break;
+      case 'workcheckin': renderWorkCheckin(container); break;
+      case 'worktasks': renderWorkTasks(container); break;
+      case 'projectpractice': renderProjectPractice(container); break;
+      default: renderDashboard(container);
+    }
+  }
+
+  // ====================== 侧边栏动态渲染 ======================
+  function renderSidebar() {
+    const nav = document.getElementById('sidebarNav');
+    const items = state.mode === 'learn' ? [
+      { page: 'dashboard', icon: 'fa-chart-pie', label: '仪表盘' },
+      { page: 'learncenter', icon: 'fa-graduation-cap', label: '学习中心' },
+      { page: 'aiexam', icon: 'fa-file-circle-check', label: 'AI考试' },
+      { page: 'forum', icon: 'fa-comments', label: '论坛' },
+      { page: 'tools', icon: 'fa-toolbox', label: '工具' },
+      { page: 'roadmap', icon: 'fa-road', label: '学习路线' },
+    ] : [
+      { page: 'dashboard', icon: 'fa-chart-pie', label: '仪表盘' },
+      { page: 'workcheckin', icon: 'fa-clock', label: '上班打卡' },
+      { page: 'worktasks', icon: 'fa-list-check', label: '今日任务' },
+      { page: 'projectpractice', icon: 'fa-laptop-code', label: '项目实操' },
+      { page: 'forum', icon: 'fa-comments', label: '论坛' },
+      { page: 'tools', icon: 'fa-toolbox', label: '工具' },
+    ];
+    nav.innerHTML = items.map(item => `
+      <a class="nav-item ${state.currentPage===item.page?'active':''}" data-page="${item.page}">
+        <i class="fa-solid ${item.icon}"></i> ${item.label}
+      </a>
+    `).join('');
+    // 绑定事件
+    nav.querySelectorAll('.nav-item').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        navigateTo(el.dataset.page);
+        renderSidebar(); // 更新 active 状态
+      });
+    });
+  }
+
+  // ====================== 页面渲染函数 ======================
+  function renderDashboard(container) {
+    container.innerHTML = `
+      <h2>📊 仪表盘</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h4>📅 今日学习计划</h4>
+          <div id="dailyPlanList"></div>
+          <div class="flex-row" style="margin-top:12px;">
+            <input type="text" id="newPlanInput" placeholder="添加任务...">
+            <button class="btn btn-sm" onclick="addDailyPlan()">+</button>
+          </div>
+        </div>
+        <div class="card">
+          <h4>🤖 AI 老师</h4>
+          <textarea id="aiTeacherCode" style="width:100%; height:100px;" placeholder="粘贴代码分析错误..."></textarea>
+          <button class="btn btn-sm" onclick="analyzeCode()" style="margin-top:8px;">分析</button>
+          <div id="aiOutput" style="margin-top:8px; white-space:pre-wrap;"></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:20px; cursor:pointer;" onclick="navigateTo('roadmap')">
+        <h4>🗺️ 学习路线概览 <span class="tag">${roleName()}</span></h4>
+        <div id="roadmapPreview"></div>
+      </div>
+    `;
+    renderDailyPlan();
+    renderRoadmapPreview();
+  }
+
+  function renderDailyPlan() {
+    const plans = JSON.parse(localStorage.getItem('daily_plans') || '[]');
+    const list = document.getElementById('dailyPlanList');
+    if (list) list.innerHTML = plans.map((p,i) => `<div>☐ ${p} <button onclick="removePlan(${i})" style="background:none;border:none;color:red;">✕</button></div>`).join('');
+  }
+  window.addDailyPlan = () => {
+    const input = document.getElementById('newPlanInput');
+    const val = input.value.trim();
+    if (!val) return;
+    const plans = JSON.parse(localStorage.getItem('daily_plans') || '[]');
+    plans.push(val);
+    localStorage.setItem('daily_plans', JSON.stringify(plans));
+    input.value = '';
+    renderDailyPlan();
+  };
+  window.removePlan = (i) => {
+    const plans = JSON.parse(localStorage.getItem('daily_plans') || '[]');
+    plans.splice(i,1);
+    localStorage.setItem('daily_plans', JSON.stringify(plans));
+    renderDailyPlan();
+  };
+
+  function renderRoadmapPreview() {
+    const steps = roleRoadmap()[state.role];
+    const container = document.getElementById('roadmapPreview');
+    if (!container) return;
+    container.innerHTML = steps.map((s,i) => `<span style="margin-right:12px;">${i+1}. ${s}</span>`).join('');
+  }
+
+  function renderLearnCenter(container) {
+    container.innerHTML = `
+      <h2>🎓 学习中心</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h4>📺 视频课程</h4>
+          <div class="flex-row"><input id="videoSearchInput" placeholder="搜索课程"><button class="btn btn-sm" onclick="searchCourse()">搜索</button></div>
+          <div id="courseList" style="max-height:200px; overflow-y:auto;"></div>
+          <iframe id="videoPlayer" style="height:250px; margin-top:12px;" src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen></iframe>
+        </div>
+        <div class="card">
+          <h4>📚 免费职业课程</h4>
+          <div id="freeCourses"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h4>💻 跟随练习</h4>
+        <textarea id="codeEditor" style="width:100%; height:180px;">// 练习代码</textarea>
+        <div class="flex-row"><select id="langSelect"><option>javascript</option><option>python3</option></select><button class="btn btn-sm" onclick="runCode()">运行</button></div>
+        <div id="codeOutput" style="white-space:pre-wrap;"></div>
+      </div>
+    `;
+    renderFreeCourses();
+  }
+
+  function renderFreeCourses() {
+    const courses = {
+      fullstack: ['freeCodeCamp', 'The Odin Project', 'MDN Web Docs'],
+      sdet: ['Test Automation University', 'Cypress Docs', 'Playwright 文档'],
+      qa: ['ISTQB 基础', '软件测试教程', 'Bug 管理'],
+      'ai-test': ['AI 测试入门', 'ML 模型评估', '自动化测试框架']
+    };
+    const list = courses[state.role] || [];
+    const container = document.getElementById('freeCourses');
+    if (container) container.innerHTML = list.map(c => `<div class="card" style="padding:8px 12px;">📘 ${c}</div>`).join('');
+  }
+
+  function renderAIExam(container) {
+    container.innerHTML = `
+      <h2>📝 AI 考试</h2>
+      <div class="card">
+        <p>当前职业：<strong>${roleName()}</strong></p>
+        <button class="btn" onclick="startExam()">生成试卷</button>
+        <div id="examPaper" style="margin-top:16px;"></div>
+        <div id="examScore"></div>
+      </div>
+    `;
+  }
+
+  function renderForum(container) {
+    container.innerHTML = `
+      <h2>💬 开发者论坛</h2>
+      <div class="flex-row" style="margin-bottom:12px;">
+        <select id="forumCategory">
+          <option value="all">全部</option>
+          <option value="learn">学习区</option>
+          <option value="work">上班区</option>
+          <option value="fullstack">全栈</option>
+          <option value="sdet">测开</option>
+          <option value="qa">测试</option>
+          <option value="ai-test">AI测试</option>
+        </select>
+        <button class="btn btn-sm" onclick="filterForum()">筛选</button>
+      </div>
+      <div class="card">
+        <textarea id="newPost" placeholder="分享你的想法..." style="width:100%; height:80px;"></textarea>
+        <button class="btn btn-sm" onclick="addPost()">发布</button>
+      </div>
+      <div id="forumPosts" style="margin-top:16px;"></div>
+    `;
+    renderForumPosts();
+  }
+
+  function renderTools(container) {
+    const toolMap = {
+      fullstack: ['JSON 格式化', 'Base64 编解码', '颜色转换'],
+      sdet: ['正则测试', 'API 测试', '时间戳'],
+      qa: ['Bug 模板', '用例生成', '时间戳'],
+      'ai-test': ['数据生成', '模型评估', '正则测试']
+    };
+    const tools = toolMap[state.role] || [];
+    container.innerHTML = `
+      <h2>👑 工具箱</h2>
+      <div class="flex-row" style="margin-bottom:16px;">
+        ${tools.map(t => `<button class="btn btn-sm" onclick="openTool('${t}')">${t}</button>`).join('')}
+      </div>
+      <div id="toolArea"></div>
+    `;
+  }
+
+  function renderRoadmapPage(container) {
+    container.innerHTML = `
+      <h2>🗺️ 学习路线 · ${roleName()}</h2>
+      <div class="level-selector" style="margin-bottom:16px;">
+        <button class="level-btn ${state.level==='junior'?'active':''}" onclick="setLevel('junior')">初级</button>
+        <button class="level-btn ${state.level==='middle'?'active':''}" onclick="setLevel('middle')">中级</button>
+        <button class="level-btn ${state.level==='senior'?'active':''}" onclick="setLevel('senior')">高级</button>
+      </div>
+      <div id="roadmapSteps"></div>
+    `;
+    renderRoadmapSteps();
+  }
+
+  function renderWorkCheckin(container) {
+    container.innerHTML = `
+      <h2>⏰ 上班打卡</h2>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:48px; font-weight:bold;" id="clockDisplay">00:00:00</div>
+        <button class="btn" onclick="toggleClock()" id="clockBtn">开始</button>
+        <div id="checkinLog" style="margin-top:16px;"></div>
+      </div>
+    `;
+    updateClockDisplay();
+    renderCheckinLog();
+  }
+
+  function renderWorkTasks(container) {
+    container.innerHTML = `
+      <h2>📋 今日任务</h2>
+      <div class="card">
+        <button class="btn" onclick="generateWorkTasks()">🤖 AI 生成任务</button>
+        <div id="workTaskList" style="margin-top:16px;"></div>
+      </div>
+    `;
+  }
+
+  function renderProjectPractice(container) {
+    container.innerHTML = `
+      <h2>🛠 项目实操</h2>
+      <div class="card">
+        <button class="btn" onclick="generatePracticeProject()">✨ 生成项目步骤</button>
+        <div id="projectSteps" style="margin-top:16px;"></div>
+      </div>
+    `;
+  }
+
+  // ====================== 辅助函数 ======================
+  function roleName() {
+    const map = { fullstack:'全栈开发', sdet:'测试开发', qa:'测试工程师', 'ai-test':'AI测试' };
+    return map[state.role] || '';
+  }
+
+  function roleRoadmap() {
+    return {
+      fullstack: ['HTML/CSS', 'JavaScript', 'React', 'Node.js', '数据库'],
+      sdet: ['自动化基础', 'CI/CD', '性能测试', '安全测试'],
+      qa: ['测试理论', '用例设计', '缺陷管理', '回归测试'],
+      'ai-test': ['AI基础', '模型评估', '数据生成', '自动化框架']
+    };
+  }
+
+  // ====================== AI 调用 ======================
+  async function callAI(messages) {
+    if (!config.githubToken) { toast('请先配置 GitHub Token'); return null; }
+    try {
+      const res = await fetch('https://models.github.ai/inference/v1/chat/completions', {
+        method:'POST',
+        headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${config.githubToken}` },
+        body: JSON.stringify({ model:'gpt-4o', messages, max_tokens:600 })
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      return data.choices?.[0]?.message?.content || null;
+    } catch(e) {
+      toast('AI 调用失败，请检查 Token');
+      return null;
+    }
+  }
+
+  // ====================== 各功能具体实现 ======================
+  window.analyzeCode = async () => {
+    const code = document.getElementById('aiTeacherCode')?.value.trim();
+    if (!code) return;
+    const out = document.getElementById('aiOutput');
+    out.textContent = '分析中...';
+    const reply = await callAI([{ role:'user', content:`作为编程导师，分析以下代码的错误和改进建议：\n${code}` }]);
+    out.textContent = reply || '无回复';
+  };
+
+  window.searchCourse = async () => {
+    if (!config.youtubeKey) return toast('请配置 YouTube Key');
+    const q = document.getElementById('videoSearchInput')?.value.trim();
+    if (!q) return;
+    const list = document.getElementById('courseList');
+    list.innerHTML = '搜索中...';
+    const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=5&q=${q}+programming&type=video&key=${config.youtubeKey}`);
+    const data = await res.json();
+    list.innerHTML = data.items?.map(v => `<div onclick="document.getElementById('videoPlayer').src='https://www.youtube.com/embed/${v.id.videoId}'">${v.snippet.title}</div>`).join('');
+  };
+
+  window.startExam = async () => {
+    const paper = document.getElementById('examPaper');
+    paper.innerHTML = '生成中...';
+    const topic = roleName();
+    const reply = await callAI([{ role:'user', content:`生成关于“${topic}”的3道单选题，JSON数组：[{"q":"题目","options":["A","B","C","D"],"answer":0}]，只输出JSON。` }]);
+    if (!reply) { paper.innerHTML = '生成失败'; return; }
+    try {
+      const jsonStr = reply.replace(/```json|```/g,'').trim();
+      const questions = JSON.parse(jsonStr);
+      window.currentExam = questions;
+      paper.innerHTML = questions.map((q,i) => `
+        <div class="exam-question"><strong>${i+1}. ${q.q}</strong>
+          ${q.options.map((opt,oi) => `<div class="exam-option" data-q="${i}" data-o="${oi}" onclick="selectExamOpt(this)">${String.fromCharCode(65+oi)}. ${opt}</div>`).join('')}
+        </div>`).join('') + '<button class="btn btn-sm" onclick="submitExamAnswer()">提交</button>';
+    } catch(e) { paper.innerHTML = '解析失败，请重试'; }
+  };
+  window.selectExamOpt = (el) => {
+    el.parentElement.querySelectorAll('.exam-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+  };
+  window.submitExamAnswer = () => {
+    let score = 0;
+    document.querySelectorAll('.exam-question').forEach((q,i) => {
+      const sel = q.querySelector('.exam-option.selected');
+      if (sel && parseInt(sel.dataset.o) === window.currentExam[i].answer) score++;
+    });
+    document.getElementById('examScore').textContent = `得分：${score}/${window.currentExam.length}`;
+  };
+
+  window.generateWorkTasks = async () => {
+    const list = document.getElementById('workTaskList');
+    list.innerHTML = '生成中...';
+    const reply = await callAI([{ role:'user', content:`你是一名${roleName()}技术主管，安排今日4项工作任务，JSON数组：[{"title":"任务标题","desc":"描述"}]` }]);
+    if (!reply) { list.innerHTML = '生成失败'; return; }
+    const tasks = JSON.parse(reply.replace(/```json|```/g,'').trim());
+    list.innerHTML = tasks.map(t => `<div class="task-step"><strong>${t.title}</strong><p>${t.desc}</p></div>`).join('');
+  };
+
+  window.generatePracticeProject = async () => {
+    const container = document.getElementById('projectSteps');
+    container.innerHTML = '生成中...';
+    const reply = await callAI([{ role:'user', content:`为${roleName()}设计一个包含5个步骤的实操项目，JSON：[{"step":1,"title":"步骤标题","desc":"描述"}]` }]);
+    if (!reply) { container.innerHTML = '失败'; return; }
+    const steps = JSON.parse(reply.replace(/```json|```/g,'').trim());
+    container.innerHTML = steps.map(s => `<div class="task-step"><strong>${s.step}. ${s.title}</strong><p>${s.desc}</p></div>`).join('');
+  };
+
+  // 论坛相关
+  window.addPost = () => {
+    const text = document.getElementById('newPost').value.trim();
+    if (!text) return;
+    const posts = JSON.parse(localStorage.getItem('forum_posts') || '[]');
+    const category = document.getElementById('forumCategory')?.value || 'all';
+    posts.push({ text, time: new Date().toLocaleString(), user: state.user?.login || '匿名', category, mode: state.mode });
+    localStorage.setItem('forum_posts', JSON.stringify(posts));
+    document.getElementById('newPost').value = '';
+    renderForumPosts();
+  };
+  window.filterForum = () => renderForumPosts();
+  function renderForumPosts() {
+    const posts = JSON.parse(localStorage.getItem('forum_posts') || '[]');
+    const cat = document.getElementById('forumCategory')?.value || 'all';
+    const filtered = cat === 'all' ? posts : posts.filter(p => p.category === cat || p.mode === cat);
+    const container = document.getElementById('forumPosts');
+    if (container) container.innerHTML = filtered.map(p => `<div class="forum-post"><strong>${p.user}</strong> [${p.category}] ${p.time}<p>${p.text}</p></div>`).join('');
+  }
+
+  // 工具
+  window.openTool = (name) => {
+    const area = document.getElementById('toolArea');
+    if (name === 'JSON 格式化') area.innerHTML = '<textarea id="jsonInput" style="width:100%;">{"a":1}</textarea><button onclick="formatJson()">格式化</button><pre id="jsonOut"></pre>';
+    // 其他工具类似，略
+  };
+
+  // 打卡时钟
+  let clockInterval;
+  window.toggleClock = () => {
+    const btn = document.getElementById('clockBtn');
+    if (clockInterval) {
+      clearInterval(clockInterval);
+      clockInterval = null;
+      btn.textContent = '开始';
+    } else {
+      clockInterval = setInterval(updateClock, 1000);
+      btn.textContent = '暂停';
+      localStorage.setItem('clock_start', Date.now().toString());
+    }
+  };
+  function updateClock() {
+    const start = parseInt(localStorage.getItem('clock_start') || '0');
+    const elapsed = start ? Math.floor((Date.now() - start)/1000) : 0;
+    const h = Math.floor(elapsed/3600), m = Math.floor((elapsed%3600)/60), s = elapsed%60;
+    document.getElementById('clockDisplay').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+
+  // 等级设置
+  window.setLevel = (lvl) => {
+    state.level = lvl;
+    renderCurrentPage();
+  };
+
+  // 学习路线步骤渲染
+  function renderRoadmapSteps() {
+    const steps = roleRoadmap()[state.role];
+    const levels = ['junior','middle','senior'];
+    const currentIdx = levels.indexOf(state.level);
+    const container = document.getElementById('roadmapSteps');
+    if (!container) return;
+    container.innerHTML = steps.map((s, i) => `<div class="task-step" style="opacity:${i <= currentIdx ? 1 : 0.5};">${i+1}. ${s} ${i <= currentIdx ? '✅' : '🔒'}</div>`).join('');
+  }
+
+  // 初始化
   window.addEventListener('DOMContentLoaded', () => {
     loadConfig();
-    updateDashboardInfo();
-    updateWorkTaskTitle();
-    updateExamLabels();
-    updatePracticeLabels();
-    renderForum();
+    renderSidebar();
+    navigateTo('dashboard');
+    updateClock();
+    setInterval(updateClock, 1000);
   });
 </script>
 </body>
