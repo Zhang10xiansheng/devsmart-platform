@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevSmart 平台 v1.0.7</title>
+    <title>DevSmart 平台 v2.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
@@ -14,6 +14,9 @@
             --text: #e2e8f0;
             --muted: #64748b;
             --radius: 10px;
+            --green: #10b981;
+            --orange: #f59e0b;
+            --purple: #8b5cf6;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
         body { background:var(--bg); color:var(--text); font-family:system-ui, sans-serif; height:100vh; display:flex; }
@@ -33,8 +36,16 @@
         .main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
         .topbar {
             padding:12px 24px; background:#12171f; border-bottom:1px solid var(--border);
-            display:flex; align-items:center; gap:12px;
+            display:flex; align-items:center; gap:16px;
         }
+        .mode-switch {
+            display:flex; background:var(--card); border-radius:30px; padding:4px;
+        }
+        .mode-btn {
+            padding:8px 20px; border-radius:26px; cursor:pointer; font-size:14px;
+            border:none; background:transparent; color:var(--muted);
+        }
+        .mode-btn.active { background:var(--blue); color:#fff; }
         .btn {
             background:var(--blue); border:none; color:#fff; padding:8px 18px;
             border-radius:6px; cursor:pointer; font-size:14px; display:inline-flex; align-items:center; gap:6px;
@@ -48,316 +59,390 @@
         .page { display:none; }
         .page.active { display:block; }
         .content-scroll { flex:1; overflow-y:auto; padding:12px; }
-        .config-panel {
-            position:fixed; top:60px; right:20px; width:320px;
-            background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
-            padding:20px; z-index:999; box-shadow:0 10px 25px rgba(0,0,0,0.4);
-        }
-        .config-panel label { font-size:13px; color:var(--muted); display:block; margin-bottom:4px; }
-        .config-panel input {
-            width:100%; margin-bottom:12px; padding:10px; background:#0d1117;
-            border:1px solid var(--border); border-radius:6px; color:var(--text);
-        }
-        .close-btn { position:absolute; top:12px; right:16px; cursor:pointer; color:var(--muted); }
         .toast {
             position:fixed; top:20px; right:20px; background:var(--blue);
             color:#fff; padding:12px 20px; border-radius:8px; z-index:9999;
         }
-        iframe { width:100%; height:450px; border:none; border-radius:8px; }
-        textarea.code-area {
-            width:100%; min-height:200px; background:#0d1117; color:#e2e8f0;
-            border:1px solid var(--border); border-radius:6px; padding:12px;
-            font-family:monospace; resize:vertical;
-        }
-        .output-box {
-            background:#0d1117; border-radius:6px; padding:12px; margin-top:12px;
-            font-family:monospace; white-space:pre-wrap; max-height:200px; overflow-y:auto;
-        }
-        .flex-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+        .flex-row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+        .dashboard-stat { text-align:center; padding:12px; }
+        .progress-bar { height:8px; background:var(--border); border-radius:10px; overflow:hidden; }
+        .progress-fill { height:100%; border-radius:10px; background:var(--blue); }
+        iframe { width:100%; border:none; border-radius:8px; }
+        .forum-post { padding:12px; border-bottom:1px solid var(--border); }
+        .task-card { padding:12px; border-left:3px solid var(--blue); margin:8px 0; background:#1a1f2b; border-radius:6px; }
+        .exam-question { margin-bottom:16px; }
+        .exam-option { padding:8px 12px; margin:4px 0; border-radius:6px; cursor:pointer; border:1px solid var(--border); }
+        .exam-option.selected { border-color:var(--blue); background:rgba(59,130,246,0.1); }
+        .role-btn { padding:8px 16px; border-radius:20px; border:1px solid var(--border); background:transparent; color:var(--text); cursor:pointer; }
+        .role-btn.active { background:var(--blue); border-color:var(--blue); }
     </style>
 </head>
 <body>
 
+<!-- 侧边栏 -->
 <div class="sidebar">
     <h2>🧠 DevSmart</h2>
-    <a class="nav-item active" data-page="dash"><i class="fa-solid fa-gauge-high"></i> 仪表盘</a>
+    <a class="nav-item active" data-page="dashboard"><i class="fa-solid fa-chart-line"></i> 仪表盘</a>
     <a class="nav-item" data-page="learn"><i class="fa-solid fa-play"></i> 学习中心</a>
     <a class="nav-item" data-page="work"><i class="fa-solid fa-briefcase"></i> 模拟上班</a>
     <a class="nav-item" data-page="exam"><i class="fa-solid fa-file-pen"></i> AI 考试</a>
     <a class="nav-item" data-page="practice"><i class="fa-solid fa-code"></i> 项目实操</a>
-    <a class="nav-item" data-page="jobs"><i class="fa-solid fa-hand-holding-dollar"></i> 兼职广场</a>
+    <a class="nav-item" data-page="forum"><i class="fa-solid fa-comments"></i> 开发者论坛</a>
     <a class="nav-item" data-page="tools"><i class="fa-solid fa-crown"></i> 小公举工具箱</a>
 </div>
 
+<!-- 主区域 -->
 <div class="main">
     <div class="topbar">
-        <button class="btn btn-outline btn-sm" id="toggleConfigBtn"><i class="fa-solid fa-gear"></i> 设置</button>
-        <span style="margin-left:auto;">v1.0.7</span>
+        <div class="mode-switch" id="modeSwitch">
+            <button class="mode-btn active" data-mode="learn">🎓 学习模式</button>
+            <button class="mode-btn" data-mode="work">💼 上班模式</button>
+        </div>
+        <div id="modeIndicator" style="font-size:14px; color:var(--muted);">当前：学习模式</div>
+        <div style="margin-left:auto; display:flex; gap:12px;">
+            <button class="btn btn-outline btn-sm" id="configBtn"><i class="fa-solid fa-key"></i> 设置</button>
+            <span style="font-size:14px;">v2.0</span>
+        </div>
     </div>
+
     <div class="content-scroll">
         <!-- 仪表盘 -->
-        <div class="page active" id="page-dash">
-            <div class="card">
-                <h3>👋 AI 助手</h3>
-                <div id="chatBox" style="max-height:350px; overflow-y:auto; margin:12px 0;">
-                    <div style="background:#1a1f2b; padding:8px 12px; border-radius:8px;">你好！我是 DevSmart AI。</div>
+        <div class="page active" id="page-dashboard">
+            <h3>📊 仪表盘</h3>
+            <div class="grid-2">
+                <div class="card">
+                    <h4>学习进度</h4>
+                    <div style="margin:12px 0;">
+                        <span>全栈开发路线</span>
+                        <div class="progress-bar"><div class="progress-fill" style="width:68%;"></div></div>
+                    </div>
+                    <div>
+                        <span>测试开发进阶</span>
+                        <div class="progress-bar"><div class="progress-fill" style="width:45%; background:var(--green);"></div></div>
+                    </div>
                 </div>
-                <div class="flex-row">
-                    <input type="text" id="chatInput" placeholder="问点什么..." style="flex:1; padding:8px; background:#0d1117; border:1px solid var(--border); border-radius:6px; color:var(--text);">
-                    <button class="btn btn-sm" onclick="sendChat()">发送</button>
+                <div class="card dashboard-stat">
+                    <h4>本周活跃</h4>
+                    <div style="font-size:32px; font-weight:bold;">12h</div>
+                    <div>学习时间</div>
+                    <div style="font-size:24px; margin-top:8px;">5</div>
+                    <div>完成项目</div>
                 </div>
             </div>
+            <div class="card" style="margin-top:12px;">
+                <h4>🤖 AI 老师</h4>
+                <textarea id="aiTeacherCode" style="width:100%;height:120px;background:#0d1117;color:var(--text);border:1px solid var(--border);border-radius:6px;padding:12px;font-family:monospace;" placeholder="粘贴你的代码，让AI老师分析错误或提出优化建议..."></textarea>
+                <button class="btn btn-sm" onclick="analyzeCode()" style="margin-top:8px;">🔍 分析代码</button>
+                <div id="aiTeacherOutput" style="margin-top:8px; padding:12px; background:#0d1117; border-radius:6px; white-space:pre-wrap;"></div>
+            </div>
         </div>
+
         <!-- 学习中心 -->
         <div class="page" id="page-learn">
-            <div class="card">
-                <h3>📺 视频</h3>
-                <div class="flex-row" style="margin-bottom:8px;">
-                    <input type="text" id="videoIdInput" placeholder="YouTube 视频 ID" style="flex:1; padding:8px; background:#0d1117; border:1px solid var(--border); border-radius:6px; color:var(--text);">
-                    <button class="btn btn-sm" onclick="loadVideo()">▶ 播放</button>
+            <h3>🎓 学习中心 (边看边练)</h3>
+            <div class="grid-2">
+                <div class="card">
+                    <h4>📺 课程视频</h4>
+                    <div class="flex-row" style="margin-bottom:8px;">
+                        <input type="text" id="videoSearchInput" placeholder="搜索课程关键词" style="flex:1; padding:8px; background:#0d1117; border:1px solid var(--border); border-radius:6px; color:var(--text);">
+                        <button class="btn btn-sm" onclick="searchCourse()">搜索</button>
+                    </div>
+                    <div id="courseList" style="max-height:200px; overflow-y:auto;"></div>
+                    <iframe id="videoPlayer" style="height:315px; margin-top:12px;" src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen></iframe>
                 </div>
-                <iframe id="videoFrame" src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen></iframe>
-            </div>
-            <div class="card">
-                <h3>💻 云端练习</h3>
-                <textarea id="codeEditor" class="code-area">console.log("Hello, DevSmart!");</textarea>
-                <div class="flex-row" style="margin-top:8px;">
-                    <select id="langSelect" style="padding:6px; background:#0d1117; border:1px solid var(--border); border-radius:6px; color:var(--text);">
-                        <option value="javascript">JavaScript</option>
-                        <option value="python3">Python 3</option>
-                    </select>
-                    <button class="btn btn-sm" onclick="runCode()">🚀 运行</button>
+                <div class="card">
+                    <h4>💻 跟随练习</h4>
+                    <textarea id="learnCodeEditor" style="width:100%;height:240px;background:#0d1117;color:var(--text);border:1px solid var(--border);border-radius:6px;padding:12px;font-family:monospace;">// 在这里编写练习代码</textarea>
+                    <div class="flex-row" style="margin-top:8px;">
+                        <select id="learnLangSelect" style="padding:6px; background:#0d1117; border:1px solid var(--border); border-radius:6px; color:var(--text);">
+                            <option value="javascript">JavaScript</option>
+                            <option value="python3">Python 3</option>
+                        </select>
+                        <button class="btn btn-sm" onclick="runLearnCode()">🚀 运行</button>
+                    </div>
+                    <div id="learnCodeOutput" style="margin-top:8px; padding:12px; background:#0d1117; border-radius:6px; font-family:monospace; white-space:pre-wrap; max-height:150px; overflow-y:auto;"></div>
                 </div>
-                <div id="codeOutput" class="output-box" style="display:none;"></div>
             </div>
         </div>
+
         <!-- 模拟上班 -->
         <div class="page" id="page-work">
+            <h3>💼 模拟上班</h3>
+            <div class="flex-row" style="margin-bottom:16px;">
+                <button class="role-btn active" data-role="sdet">测试开发工程师</button>
+                <button class="role-btn" data-role="qa">测试工程师</button>
+                <button class="role-btn" data-role="fullstack">全栈开发</button>
+                <button class="role-btn" data-role="ai-test">AI测试工程师</button>
+            </div>
             <div class="card">
-                <h3>💼 AI 分配任务</h3>
-                <div class="flex-row" style="margin-bottom:8px;">
-                    <input type="text" id="topicInput" placeholder="学习主题" style="flex:1; padding:8px; background:#0d1117; border:1px solid var(--border); border-radius:6px; color:var(--text);">
-                    <button class="btn btn-sm" onclick="generateTasks()">🤖 生成</button>
-                </div>
-                <div id="taskResult"></div>
+                <h4 id="roleTitle">今日任务 - 测试开发工程师</h4>
+                <div id="taskCards"></div>
+                <button class="btn btn-sm" onclick="generateWorkTasks()">🤖 重新生成任务</button>
             </div>
         </div>
+
         <!-- AI 考试 -->
         <div class="page" id="page-exam">
+            <h3>📝 AI 考试</h3>
             <div class="card">
-                <h3>📝 AI 出题</h3>
-                <div class="flex-row" style="margin-bottom:8px;">
-                    <input type="text" id="examTopic" value="React 18" style="flex:1; padding:8px; background:#0d1117; border:1px solid var(--border); border-radius:6px; color:var(--text);">
-                    <button class="btn btn-sm" onclick="genExam()">生成考题</button>
+                <div class="flex-row" style="margin-bottom:12px;">
+                    <input type="text" id="examTopicInput" value="React 18" style="flex:1; padding:8px; background:#0d1117; border:1px solid var(--border); border-radius:6px; color:var(--text);">
+                    <button class="btn btn-sm" onclick="startExam()">生成试卷</button>
                 </div>
-                <pre id="examResult" style="background:#0d1117; padding:12px; border-radius:6px; white-space:pre-wrap;"></pre>
+                <div id="examPaper"></div>
+                <div id="examScore" style="margin-top:12px; font-weight:bold;"></div>
             </div>
         </div>
+
         <!-- 项目实操 -->
         <div class="page" id="page-practice">
+            <h3>🛠 项目实操 (跟随式)</h3>
             <div class="card">
-                <h3>🛠 StackBlitz 在线项目</h3>
-                <div class="flex-row" style="margin-bottom:12px;">
-                    <button class="btn btn-sm" onclick="openProject('react-ts')">⚛️ React + TS</button>
-                    <button class="btn btn-sm" onclick="openProject('vue')">💚 Vue 3</button>
-                    <button class="btn btn-sm" onclick="openProject('node')">🟢 Node.js</button>
+                <h4>当前项目：搭建一个个人博客</h4>
+                <p style="color:var(--muted);">按照下方步骤依次完成，每完成一步点击“标记完成”。</p>
+                <div id="projectSteps">
+                    <div class="task-card">1. 初始化 React 项目并使用 create-react-app 创建结构 <button class="btn btn-sm" style="float:right;" onclick="this.parentElement.style.opacity='0.5'">完成</button></div>
+                    <div class="task-card">2. 创建导航组件和页面路由 <button class="btn btn-sm" style="float:right;">完成</button></div>
+                    <div class="task-card">3. 添加博客列表和文章详情页 <button class="btn btn-sm" style="float:right;">完成</button></div>
+                    <div class="task-card">4. 使用 Markdown 渲染文章内容 <button class="btn btn-sm" style="float:right;">完成</button></div>
+                    <div class="task-card">5. 部署到 GitHub Pages <button class="btn btn-sm" style="float:right;">完成</button></div>
                 </div>
-                <iframe id="practiceFrame" src="about:blank"></iframe>
             </div>
         </div>
-        <!-- 兼职广场 -->
-        <div class="page" id="page-jobs">
+
+        <!-- 开发者论坛 -->
+        <div class="page" id="page-forum">
+            <h3>💬 开发者论坛</h3>
             <div class="card">
-                <h3>💼 远程兼职</h3>
-                <button class="btn btn-sm" onclick="fetchJobs()">刷新岗位</button>
-                <div id="jobList" style="margin-top:12px;"></div>
+                <textarea id="newPost" placeholder="分享你的经验或提问..." style="width:100%;height:80px;background:#0d1117;color:var(--text);border:1px solid var(--border);border-radius:6px;padding:12px;"></textarea>
+                <button class="btn btn-sm" style="margin-top:8px;" onclick="addPost()">发布</button>
             </div>
+            <div id="forumPosts" style="margin-top:12px;"></div>
         </div>
+
         <!-- 小公举工具箱 -->
         <div class="page" id="page-tools">
-            <div class="card">
-                <h3>👑 小公举工具箱</h3>
-                <div class="flex-row" style="margin-bottom:16px;">
-                    <button class="btn btn-sm" onclick="showTool('json')">📋 JSON 格式化</button>
-                    <button class="btn btn-sm" onclick="showTool('color')">🎨 颜色转换</button>
-                    <button class="btn btn-sm" onclick="showTool('timestamp')">⏱ 时间戳</button>
-                </div>
-                <div id="toolArea"></div>
+            <h3>👑 小公举工具箱</h3>
+            <div class="flex-row" style="margin-bottom:16px;">
+                <button class="btn btn-sm" onclick="showTool('json')">📋 JSON 格式化</button>
+                <button class="btn btn-sm" onclick="showTool('color')">🎨 颜色转换</button>
+                <button class="btn btn-sm" onclick="showTool('timestamp')">⏱ 时间戳</button>
             </div>
+            <div id="toolArea"></div>
         </div>
     </div>
 </div>
 
-<div class="config-panel hidden" id="configPanel">
-    <span class="close-btn" onclick="togglePanel(false)">✕</span>
+<!-- 设置面板 -->
+<div class="config-panel hidden" id="configPanel" style="position:fixed; top:60px; right:20px; width:300px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px; z-index:999;">
+    <span style="position:absolute; top:12px; right:16px; cursor:pointer;" onclick="document.getElementById('configPanel').classList.add('hidden')">✕</span>
     <h4>🔑 API 配置</h4>
-    <p style="font-size:11px; color:var(--muted); margin-bottom:10px;">⚠️ Token 仅保存在本地</p>
     <label>GitHub Token</label>
-    <input type="password" id="ghToken" placeholder="ghp_xxx">
-    <label>JDoodle ID (选填)</label>
-    <input type="text" id="jdoodleId">
-    <label>JDoodle Secret (选填)</label>
-    <input type="password" id="jdoodleSecret">
+    <input type="password" id="ghToken" placeholder="ghp_..." style="width:100%; margin-bottom:12px; padding:8px; background:#0d1117; border:1px solid var(--border); color:var(--text);">
+    <label>YouTube API Key (可选)</label>
+    <input type="password" id="ytKey" placeholder="AIza..." style="width:100%; margin-bottom:12px; padding:8px; background:#0d1117; border:1px solid var(--border); color:var(--text);">
     <button class="btn" onclick="saveConfig()" style="width:100%;">💾 保存</button>
 </div>
 
 <div id="toastContainer"></div>
 
 <script>
-    const CONFIG_KEY = 'devsmart_v1.0.7';
-    let config = { githubToken:'', jdoodleId:'', jdoodleSecret:'' };
+    // 全局状态
+    let currentMode = 'learn';
+    let currentRole = 'sdet';
+    let config = { githubToken:'', youtubeKey:'' };
+    const CONFIG_KEY = 'devsmart_config_v2';
 
+    // 初始化配置
     function loadConfig() {
         const saved = localStorage.getItem(CONFIG_KEY);
         if(saved) config = JSON.parse(saved);
         document.getElementById('ghToken').value = config.githubToken || '';
-        document.getElementById('jdoodleId').value = config.jdoodleId || '';
-        document.getElementById('jdoodleSecret').value = config.jdoodleSecret || '';
-        console.log('配置已加载，Token 存在：', !!config.githubToken);
+        document.getElementById('ytKey').value = config.youtubeKey || '';
     }
-
     function saveConfig() {
         config.githubToken = document.getElementById('ghToken').value.trim();
-        config.jdoodleId = document.getElementById('jdoodleId').value.trim();
-        config.jdoodleSecret = document.getElementById('jdoodleSecret').value.trim();
+        config.youtubeKey = document.getElementById('ytKey').value.trim();
         localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
-        showToast('配置已保存 ✅', 'success');
-        console.log('配置已保存，Token 存在：', !!config.githubToken);
+        showToast('配置已保存');
     }
+    document.getElementById('configBtn').addEventListener('click', ()=> document.getElementById('configPanel').classList.toggle('hidden'));
 
-    function togglePanel(show) {
-        const panel = document.getElementById('configPanel');
-        if(show === undefined) panel.classList.toggle('hidden');
-        else if(show) panel.classList.remove('hidden');
-        else panel.classList.add('hidden');
-    }
-
-    document.getElementById('toggleConfigBtn').addEventListener('click', () => togglePanel());
-
-    function showToast(msg, type='info') {
-        const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+    function showToast(msg) {
+        const t = document.createElement('div'); t.className='toast'; t.textContent=msg;
         document.getElementById('toastContainer').appendChild(t);
-        setTimeout(() => t.remove(), 3000);
+        setTimeout(()=>t.remove(),3000);
     }
 
-    // 页面切换
+    // 页面导航
     document.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
             item.classList.add('active');
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
             document.getElementById('page-' + item.dataset.page).classList.add('active');
         });
     });
 
-    // AI 调用
-    async function callAI(messages) {
-        if(!config.githubToken) {
-            showToast('请先在设置里配置 GitHub Token', 'error');
-            console.error('Token 为空');
-            return null;
+    // 模式切换
+    document.getElementById('modeSwitch').addEventListener('click', (e) => {
+        const btn = e.target.closest('.mode-btn');
+        if(!btn) return;
+        document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        currentMode = btn.dataset.mode;
+        document.getElementById('modeIndicator').textContent = `当前：${currentMode==='work'?'上班模式':'学习模式'}`;
+        // 自动跳转到对应页面
+        if(currentMode === 'work') {
+            document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+            document.querySelector('.nav-item[data-page="work"]').classList.add('active');
+            document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+            document.getElementById('page-work').classList.add('active');
+        } else {
+            document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+            document.querySelector('.nav-item[data-page="learn"]').classList.add('active');
+            document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+            document.getElementById('page-learn').classList.add('active');
         }
+    });
+
+    // 职业选择
+    document.querySelectorAll('.role-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('active'));
+            this.classList.add('active');
+            currentRole = this.dataset.role;
+            const titles = { sdet:'测试开发工程师', qa:'测试工程师', fullstack:'全栈开发', 'ai-test':'AI测试工程师' };
+            document.getElementById('roleTitle').textContent = '今日任务 - ' + titles[currentRole];
+        });
+    });
+
+    // AI 老师
+    async function analyzeCode() {
+        const code = document.getElementById('aiTeacherCode').value.trim();
+        if(!code) return showToast('请粘贴代码');
+        if(!config.githubToken) return showToast('请配置 GitHub Token');
+        const out = document.getElementById('aiTeacherOutput');
+        out.textContent = '分析中...';
         try {
             const res = await fetch('https://models.github.ai/inference/v1/chat/completions', {
                 method:'POST',
-                headers: {
-                    'Content-Type':'application/json',
-                    'Authorization': 'Bearer ' + config.githubToken
-                },
-                body: JSON.stringify({
-                    model: 'gpt-4o',
-                    messages: messages,
-                    max_tokens: 600
-                })
+                headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+config.githubToken },
+                body: JSON.stringify({ model:'gpt-4o', messages:[{role:'user', content:`作为一名编程老师，请检查以下代码的错误、潜在问题和改进建议，用中文友好地回复：\n${code}`}], max_tokens:800 })
             });
-            console.log('AI 响应状态:', res.status);
-            if(!res.ok) {
-                const errText = await res.text();
-                console.error('AI 错误:', errText);
-                showToast('AI 调用失败，状态码 ' + res.status, 'error');
-                return null;
-            }
             const data = await res.json();
-            return data.choices?.[0]?.message?.content || '（无回复）';
+            out.textContent = data.choices?.[0]?.message?.content || '分析失败';
         } catch(e) {
-            console.error('网络错误:', e);
-            showToast('网络错误，可能是 GitHub API 不可达', 'error');
-            return null;
+            out.textContent = '网络错误';
         }
     }
 
-    async function sendChat() {
-        const input = document.getElementById('chatInput');
-        const msg = input.value.trim();
-        if(!msg) return;
-        const box = document.getElementById('chatBox');
-        box.innerHTML += `<div style="background:var(--blue);color:#fff;padding:8px 12px;border-radius:8px;margin:4px 0;text-align:right;">${escapeHtml(msg)}</div>`;
-        input.value = '';
-        const reply = await callAI([{role:'user', content:msg}]);
-        if(reply) box.innerHTML += `<div style="background:#1a1f2b;padding:8px 12px;border-radius:8px;">${escapeHtml(reply)}</div>`;
-        box.scrollTop = box.scrollHeight;
+    // 课程搜索 (YouTube API)
+    async function searchCourse() {
+        const query = document.getElementById('videoSearchInput').value.trim();
+        if(!query) return;
+        if(!config.youtubeKey) return showToast('请配置 YouTube API Key');
+        const list = document.getElementById('courseList');
+        list.innerHTML = '搜索中...';
+        try {
+            const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=5&q=${encodeURIComponent(query)}+programming&type=video&key=${config.youtubeKey}`);
+            const data = await res.json();
+            list.innerHTML = data.items?.map(item => `
+                <div style="padding:6px; cursor:pointer; border-bottom:1px solid var(--border);" onclick="document.getElementById('videoPlayer').src='https://www.youtube.com/embed/${item.id.videoId}'">
+                    ${item.snippet.title}
+                </div>`).join('') || '无结果';
+        } catch(e) { list.innerHTML = '搜索失败'; }
     }
 
-    function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
-
-    function loadVideo() {
-        let val = document.getElementById('videoIdInput').value.trim();
-        let id = val;
-        const m = val.match(/(?:youtu\.be\/|watch\?v=|\/embed\/)([^&?/]+)/);
-        if(m) id = m[1];
-        document.getElementById('videoFrame').src = `https://www.youtube.com/embed/${id}`;
+    // 学习代码运行
+    function runLearnCode() {
+        const code = document.getElementById('learnCodeEditor').value;
+        const lang = document.getElementById('learnLangSelect').value;
+        const out = document.getElementById('learnCodeOutput');
+        out.textContent = '前端模拟运行结果：\n' + code;
+        // 实际应该调用 JDoodle，这里简化
     }
 
-    async function runCode() {
-        const code = document.getElementById('codeEditor').value;
-        const lang = document.getElementById('langSelect').value;
-        const out = document.getElementById('codeOutput'); out.style.display='block'; out.textContent='⏳...';
-        if(!config.jdoodleId || !config.jdoodleSecret) { out.textContent='需要配置 JDoodle 密钥'; return; }
-        const res = await fetch('https://api.jdoodle.com/v1/execute', {
-            method:'POST', headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({clientId:config.jdoodleId, clientSecret:config.jdoodleSecret, script:code, language:lang, versionIndex:'0'})
+    // 上班任务生成
+    async function generateWorkTasks() {
+        if(!config.githubToken) return showToast('请配置 GitHub Token');
+        const titles = { sdet:'测试开发工程师', qa:'测试工程师', fullstack:'全栈开发', 'ai-test':'AI测试工程师' };
+        const roleName = titles[currentRole];
+        document.getElementById('taskCards').innerHTML = '生成中...';
+        try {
+            const res = await fetch('https://models.github.ai/inference/v1/chat/completions', {
+                method:'POST',
+                headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+config.githubToken },
+                body: JSON.stringify({ model:'gpt-4o', messages:[{role:'user', content:`你是一名 ${roleName} 的技术主管，请为新手安排今天的4项具体工作任务。请用如下JSON数组格式回答，每一项包含任务标题和简短描述： [{"title":"任务标题","desc":"任务描述"}]`}], max_tokens:600 })
+            });
+            const data = await res.json();
+            const tasks = JSON.parse(data.choices[0].message.content.replace(/```json|```/g, '').trim());
+            document.getElementById('taskCards').innerHTML = tasks.map(t=>`<div class="task-card"><strong>${t.title}</strong><p>${t.desc}</p></div>`).join('');
+        } catch(e) { document.getElementById('taskCards').innerHTML = '生成失败，请重试'; }
+    }
+
+    // AI 考试
+    async function startExam() {
+        const topic = document.getElementById('examTopicInput').value;
+        if(!config.githubToken) return showToast('请配置 Token');
+        document.getElementById('examPaper').innerHTML = '生成试卷中...';
+        try {
+            const res = await fetch('https://models.github.ai/inference/v1/chat/completions', {
+                method:'POST',
+                headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+config.githubToken },
+                body: JSON.stringify({ model:'gpt-4o', messages:[{role:'user', content:`生成关于"${topic}"的3道单选题试卷，JSON数组：[{"q":"题目","options":["A","B","C","D"],"answer":0}]`}], max_tokens:600 })
+            });
+            const data = await res.json();
+            const questions = JSON.parse(data.choices[0].message.content.replace(/```json|```/g, '').trim());
+            window.currentExam = questions;
+            let html = '';
+            questions.forEach((q, i) => {
+                html += `<div class="exam-question"><strong>${i+1}. ${q.q}</strong>`;
+                q.options.forEach((opt, oi) => {
+                    html += `<div class="exam-option" data-q="${i}" data-o="${oi}" onclick="selectOption(this)">${String.fromCharCode(65+oi)}. ${opt}</div>`;
+                });
+                html += `</div>`;
+            });
+            html += '<button class="btn btn-sm" onclick="submitExam()">提交答卷</button>';
+            document.getElementById('examPaper').innerHTML = html;
+        } catch(e) { document.getElementById('examPaper').innerHTML = '生成失败'; }
+    }
+    function selectOption(el) {
+        const options = el.parentElement.querySelectorAll('.exam-option');
+        options.forEach(o=>o.classList.remove('selected'));
+        el.classList.add('selected');
+    }
+    function submitExam() {
+        let score = 0;
+        document.querySelectorAll('.exam-question').forEach((q, i) => {
+            const selected = q.querySelector('.exam-option.selected');
+            if(selected && parseInt(selected.dataset.o) === window.currentExam[i].answer) score++;
         });
-        const data = await res.json();
-        out.textContent = data.output || data.error || '无输出';
+        document.getElementById('examScore').textContent = `得分：${score}/${window.currentExam.length}`;
     }
 
-    async function generateTasks() {
-        const topic = document.getElementById('topicInput').value.trim();
-        if(!topic) return showToast('请输入主题');
-        document.getElementById('taskResult').innerHTML='⏳...';
-        const reply = await callAI([{role:'user', content:`为学习"${topic}"的开发者安排4项工作任务，JSON数组。`}]);
-        document.getElementById('taskResult').innerHTML = reply ? reply.replace(/\n/g,'<br>') : '生成失败';
+    // 论坛
+    function addPost() {
+        const text = document.getElementById('newPost').value.trim();
+        if(!text) return;
+        const posts = JSON.parse(localStorage.getItem('forum_posts')||'[]');
+        posts.push({text, time: new Date().toLocaleString()});
+        localStorage.setItem('forum_posts', JSON.stringify(posts));
+        document.getElementById('newPost').value = '';
+        renderForum();
+    }
+    function renderForum() {
+        const posts = JSON.parse(localStorage.getItem('forum_posts')||'[]');
+        document.getElementById('forumPosts').innerHTML = posts.map(p=>`<div class="forum-post"><p>${p.text}</p><small>${p.time}</small></div>`).join('');
     }
 
-    async function genExam() {
-        const topic = document.getElementById('examTopic').value;
-        document.getElementById('examResult').textContent='⏳...';
-        const reply = await callAI([{role:'user', content:`生成关于"${topic}"的3道单选题，JSON数组：[{"question":"","options":["A","B","C","D"],"answer":0}]。只输出JSON。`}]);
-        document.getElementById('examResult').textContent = reply || '失败';
-    }
-
-    function openProject(type) {
-        const urls = {
-            'react-ts': 'https://stackblitz.com/edit/react-ts?embed=1&file=src/App.tsx',
-            'vue': 'https://stackblitz.com/edit/vue?embed=1&file=src/App.vue',
-            'node': 'https://stackblitz.com/edit/node?embed=1&file=index.js'
-        };
-        document.getElementById('practiceFrame').src = urls[type] || urls['react-ts'];
-    }
-
-    function fetchJobs() {
-        const list = document.getElementById('jobList'); list.innerHTML='⏳...';
-        fetch('https://remotejobs.org/api/v1/jobs?category=programming&limit=5')
-        .then(r=>r.json()).then(d=>{
-            list.innerHTML = d.data?.map(j=>`<div style="padding:10px;border-bottom:1px solid var(--border);">${j.title} @ ${j.company?.name}</div>`).join('')||'无';
-        }).catch(()=>list.innerHTML='获取失败');
-    }
-
+    // 小工具
     function showTool(name) {
         const a = document.getElementById('toolArea');
         if(name==='json') {
-            a.innerHTML = `<textarea id="jsonInput" style="width:100%;height:120px;background:#0d1117;color:#e2e8f0;border:1px solid var(--border);border-radius:6px;padding:8px;">{"key":"value"}</textarea>
+            a.innerHTML = `<textarea id="jsonInput" style="width:100%;height:120px;background:#0d1117;color:var(--text);border:1px solid var(--border);border-radius:6px;padding:8px;">{"key":"value"}</textarea>
                 <div class="flex-row" style="margin-top:8px;"><button class="btn btn-sm" onclick="formatJson()">格式化</button><button class="btn btn-sm" onclick="compressJson()">压缩</button></div>
                 <pre id="jsonOutput" style="background:#0d1117;padding:12px;border-radius:6px;margin-top:8px;"></pre>`;
             window.formatJson = ()=>{ try{ const o=JSON.parse(document.getElementById('jsonInput').value); document.getElementById('jsonOutput').textContent=JSON.stringify(o,null,2); }catch(e){ document.getElementById('jsonOutput').textContent='JSON 无效'; } };
@@ -371,9 +456,10 @@
         }
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
+    // 初始化
+    window.addEventListener('DOMContentLoaded', ()=>{
         loadConfig();
-        togglePanel(false); // 默认隐藏面板
+        renderForum();
     });
 </script>
 </body>
