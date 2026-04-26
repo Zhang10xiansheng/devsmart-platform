@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevSmart Platform - 开发智慧平台 v1.0.1</title>
+
+    <!-- 字体与图标 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Monaco Editor -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/editor/editor.main.css">
+
+    <style>
+        :root {
+            --bg-primary: #0a0e14;
+            --bg-secondary: #12171f;
+            --bg-tertiary: #1a1f2b;
+            --bg-card: #151b25;
+            --bg-input: #1a1f2b;
+            --border-color: #252b35;
+            --border-active: #3b82f6;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
+            --shadow-glow-blue: 0 0 20px rgba(59, 130, 246, 0.15);
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --radius-xl: 18px;
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.25s ease;
+            --sidebar-width: 260px;
+            --header-height: 56px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            user-select: none;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ========== 侧边栏 ========== */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            z-index: 100;
+            transition: transform var(--transition-normal);
+        }
+        .sidebar-logo {
+            padding: 20px 20px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .sidebar-logo .logo-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #fff;
+            box-shadow: var(--shadow-glow-blue);
+        }
+        .sidebar-logo .logo-text {
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: -0.3px;
+            line-height: 1.2;
+        }
+        .sidebar-logo .logo-text small {
+            display: block;
+            font-weight: 400;
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 0;
+        }
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .sidebar-nav .nav-section {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            padding: 16px 12px 6px;
+            font-weight: 600;
+        }
+        .sidebar-nav .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all var(--transition-fast);
+            position: relative;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .sidebar-nav .nav-item:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        .sidebar-nav .nav-item.active {
+            background: var(--bg-tertiary);
+            color: #fff;
+            box-shadow: inset 3px 0 0 var(--accent-blue);
+            font-weight: 600;
+        }
+        .sidebar-nav .nav-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+        .nav-badge {
+            margin-left: auto;
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 20px;
+            background: var(--accent-blue);
+            color: #fff;
+            font-weight: 600;
+        }
+        .sidebar-footer {
+            padding: 12px 14px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .sidebar-footer .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        /* ========== 主区域 ========== */
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            min-width: 0;
+        }
+        .topbar {
+            height: var(--header-height);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            gap: 16px;
+            flex-shrink: 0;
+            z-index: 50;
+        }
+        .topbar .mode-switch {
+            display: flex;
+            background: var(--bg-tertiary);
+            border-radius: 30px;
+            padding: 4px;
+            gap: 2px;
+        }
+        .topbar .mode-btn {
+            padding: 8px 18px;
+            border-radius: 26px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all var(--transition-fast);
+            color: var(--text-secondary);
+            border: none;
+            background: transparent;
+            white-space: nowrap;
+            letter-spacing: -0.2px;
+        }
+        .topbar .mode-btn.active {
+            background: var(--accent-blue);
+            color: #fff;
+            font-weight: 600;
+            box-shadow: var(--shadow-md);
+        }
+        .topbar .mode-btn:hover:not(.active) {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .topbar .topbar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .topbar .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+            font-size: 15px;
+        }
+        .topbar .icon-btn:hover {
+            color: #fff;
+            background: var(--border-color);
+        }
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .content-area::-webkit-scrollbar {
+            width: 5px;
+        }
+        .content-area::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .content-area::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 10px;
+        }
+
+        /* ========== 卡片 ========== */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            transition: all var(--transition-normal);
+        }
+        .card:hover {
+            border-color: #334155;
+            box-shadow: var(--shadow-md);
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .card-title {
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: -0.3px;
+        }
+        .card-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ========== 网格 ========== */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+        @media (max-width: 1200px) {
+            .grid-3 {
+                grid-template-columns: 1fr 1fr;
+            }
+            .grid-4 {
+                grid-template-columns: 1fr 1fr;
+            }
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 768px) {
+            .grid-3,
+            .grid-4 {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                position: fixed;
+                left: -280px;
+            }
+            .sidebar.open {
+                left: 0;
+            }
+        }
+
+        /* ========== 标签 ========== */
+        .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.1px;
+        }
+        .tag-blue {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+        }
+        .tag-green {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+        }
+        .tag-orange {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+        }
+        .tag-purple {
+            background: rgba(139, 92, 246, 0.15);
+            color: #a78bfa;
+        }
+        .tag-pink {
+            background: rgba(236, 72, 153, 0.15);
+            color: #f472b6;
+        }
+
+        /* ========== 按钮 ========== */
+        .btn {
+            padding: 9px 18px;
+            border-radius: var(--radius-sm);
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: -0.2px;
+            transition: all var(--transition-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+        .btn-primary {
+            background: var(--accent-blue);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+        .btn-primary:hover {
+            background: #2563eb;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.45);
+            transform: translateY(-1px);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+        .btn-outline:hover {
+            border-color: var(--accent-blue);
+            color: #fff;
+            background: rgba(59, 130, 246, 0.05);
+        }
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 11px;
+            border-radius: 4px;
+        }
+        .btn-lg {
+            padding: 12px 24px;
+            font-size: 15px;
+            border-radius: var(--radius-md);
+        }
+        .btn-green {
+            background: var(--accent-green);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+        .btn-green:hover {
+            background: #059669;
+        }
+
+        /* ========== 输入框 ========== */
+        .input {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-family: inherit;
+            width: 100%;
+            outline: none;
+            transition: all var(--transition-fast);
+        }
+        .input:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .input::placeholder {
+            color: var(--text-muted);
+        }
+        textarea.input {
+            resize: vertical;
+            min-height: 80px;
+        }
+        select.input {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
+        }
+
+        /* ========== 进度条 ========== */
+        .progress-bar {
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-bar .fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+        .fill-blue {
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+        }
+        .fill-green {
+            background: linear-gradient(90deg, var(--accent-green), #34d399);
+        }
+        .fill-orange {
+            background: linear-gradient(90deg, var(--accent-orange), #fbbf24);
+        }
+
+        /* ========== 视频区 ========== */
+        .video-container {
+            background: #000;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 16/9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+        .video-container .play-btn {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #000;
+            transition: all var(--transition-normal);
+            z-index: 2;
+        }
+        .video-container:hover .play-btn {
+            transform: scale(1.1);
+            background: #fff;
+        }
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ========== 代码编辑器容器 ========== */
+        .editor-container {
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            background: #0d1117;
+            min-height: 300px;
+            position: relative;
+        }
+        .editor-container .editor-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: #161b22;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .editor-container .editor-header .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .dot-red {
+            background: #ef4444;
+        }
+        .dot-yellow {
+            background: #f59e0b;
+        }
+        .dot-green {
+            background: #10b981;
+        }
+        #monaco-editor {
+            height: 350px;
+            width: 100%;
+        }
+
+        /* ========== 聊天/AI区 ========== */
+        .chat-area {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .chat-msg {
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            line-height: 1.6;
+            max-width: 85%;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .chat-msg.ai {
+            background: var(--bg-tertiary);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+        .chat-msg.user {
+            background: var(--accent-blue);
+            color: #fff;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        .chat-input-row {
+            display: flex;
+            gap: 10px;
+        }
+        .chat-input-row .input {
+            flex: 1;
+        }
+
+        /* ========== 考试卡片 ========== */
+        .exam-card {
+            border-left: 3px solid var(--accent-orange);
+            padding: 14px 18px;
+            background: var(--bg-tertiary);
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            margin-bottom: 10px;
+            transition: all var(--transition-fast);
+        }
+        .exam-card:hover {
+            border-left-color: var(--accent-blue);
+        }
+        .exam-option {
+            display: block;
+            padding: 8px 14px;
+            margin: 4px 0;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-size: 13px;
+            border: 1px solid transparent;
+            background: var(--bg-card);
+        }
+        .exam-option:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--border-color);
+        }
+        .exam-option.selected {
+            border-color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.08);
+            color: #fff;
+        }
+        .exam-option.correct {
+            border-color: var(--accent-green) !important;
+            background: rgba(16, 185, 129, 0.1) !important;
+        }
+        .exam-option.wrong {
+            border-color: var(--accent-red) !important;
+            background: rgba(239, 68, 68, 0.1) !important;
+        }
+
+        /* ========== 兼职列表 ========== */
+        .job-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            transition: all var(--transition-fast);
+            cursor: pointer;
+        }
+        .job-card:hover {
+            border-color: var(--accent-blue);
+            box-shadow: var(--shadow-md);
+        }
+        .job-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        /* ========== 隐藏/显示 ========== */
+        .hidden {
+            display: none !important;
+        }
+        .page {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+        .page.active {
+            display: flex;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            padding: 14px 20px;
+            border-radius: var(--radius-md);
+            color: #fff;
+            font-weight: 600;
+            font-size: 13px;
+            animation: slideIn 0.3s ease;
+            box-shadow: var(--shadow-lg);
+            max-width: 400px;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        .toast-success {
+            background: #059669;
+        }
+        .toast-error {
+            background: #dc2626;
+        }
+        .toast-info {
+            background: var(--accent-blue);
+        }
+
+        /* 响应式 */
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 4px;
+        }
+        @media (max-width: 768px) {
+            .hamburger {
+                display: block;
+            }
+            .topbar .mode-switch {
+                gap: 0;
+            }
+            .topbar .mode-btn {
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+            .content-area {
+                padding: 14px;
+                gap: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== 侧边栏 ==================== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon"><i class="fa-solid fa-brain"></i></div>
+            <div class="logo-text">DevSmart<small>开发智慧平台 v1.0.1</small></div>
+        </div>
+        <nav class="sidebar-nav" id="sidebarNav">
+            <div class="nav-section">主菜单</div>
+            <a class="nav-item active" data-page="dashboard">
+                <i class="fa-solid fa-gauge-high"></i> 仪表盘
+            </a>
+            <a class="nav-item" data-page="learn">
+                <i class="fa-solid fa-graduation-cap"></i> 学习中心
+                <span class="nav-badge">新</span>
+            </a>
+            <a class="nav-item" data-page="work">
+                <i class="fa-solid fa-briefcase"></i> 模拟上班
+            </a>
+            <div class="nav-section">工具</div>
+            <a class="nav-item" data-page="exam">
+                <i class="fa-solid fa-file-pen"></i> AI 考试中心
+            </a>
+            <a class="nav-item" data-page="practice">
+                <i class="fa-solid fa-code"></i> 在线实操
+            </a>
+            <a class="nav-item" data-page="jobs">
+                <i class="fa-solid fa-hand-holding-dollar"></i> 兼职广场
+            </a>
+            <div class="nav-section">资源</div>
+            <a class="nav-item" data-page="courses">
+                <i class="fa-solid fa-book-open"></i> 课程抓取
+            </a>
+            <a class="nav-item" data-page="roadmaps">
+                <i class="fa-solid fa-road"></i> 规划书
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="avatar">U</div>
+            <span>开发者用户</span>
+        </div>
+    </aside>
+
+    <!-- ==================== 主区域 ==================== -->
+    <div class="main-area">
+        <!-- 顶栏 -->
+        <header class="topbar">
+            <button class="hamburger" id="hamburgerBtn" title="菜单"><i class="fa-solid fa-bars"></i></button>
+            <div class="mode-switch" id="modeSwitch">
+                <button class="mode-btn active" data-mode="learn-mode">🎓 学习模式</button>
+                <button class="mode-btn" data-mode="work-mode">💼 上班模式</button>
+            </div>
+            <div class="topbar-right">
+                <span style="font-size:12px;color:var(--text-muted);" id="currentModeLabel">当前：学习模式</span>
+                <button class="icon-btn" title="通知"><i class="fa-solid fa-bell"></i></button>
+                <button class="icon-btn" title="设置"><i class="fa-solid fa-gear"></i></button>
+            </div>
+        </header>
+
+        <!-- 内容区 - 多个页面 -->
+        <div class="content-area" id="contentArea">
+
+            <!-- ========== 仪表盘页面 ========== -->
+            <div class="page active" id="page-dashboard">
+                <h2 style="font-weight:700;font-size:22px;">👋 欢迎回来，开发者</h2>
+                <p style="color:var(--text-muted);margin-top:-12px;">DevSmart Platform · 一站式开发测试智慧平台</p>
+                <div class="grid-4">
+                    <div class="card" style="text-align:center;">
+                        <i class="fa-solid fa-book" style="font-size:28px;color:var(--accent-blue);margin-bottom:8px;display:block;"></i>
+                        <div style="font-size:24px;font-weight:800;">48</div>
+                        <div style="font-size:12px;color:var(--text-muted);">已抓取课程</div>
+                    </div>
+                    <div class="card" style="text-align:center;">
+                        <i class="fa-solid fa-file-pen" style="font-size:28px;color:var(--accent-green);margin-bottom:8px;display:block;"></i>
+                        <div style="font-size:24px;font-weight:800;">126</div>
+                        <div style="font-size:12px;color:var(--text-muted);">AI 出题数</div>
+                    </div>
+                    <div class="card" style="text-align:center;">
+                        <i class="fa-solid fa-briefcase" style="font-size:28px;color:var(--accent-orange);margin-bottom:8px;display:block;"></i>
+                        <div style="font-size:24px;font-weight:800;">23</div>
+                        <div style="font-size:12px;color:var(--text-muted);">兼职机会</div>
+                    </div>
+                    <div class="card" style="text-align:center;">
+                        <i class="fa-solid fa-code" style="font-size:28px;color:var(--accent-purple);margin-bottom:8px;display:block;"></i>
+                        <div style="font-size:24px;font-weight:800;">8</div>
+                        <div style="font-size:12px;color:var(--text-muted);">实操项目</div>
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">📊 学习进度</span><span class="tag tag-blue">本周</span></div>
+                        <div style="margin-bottom:8px;display:flex;justify-content:space-between;font-size:12px;"><span>React 高级课程</span><span>72%</span></div>
+                        <div class="progress-bar"><div class="fill fill-blue" style="width:72%;"></div></div>
+                        <div style="margin-top:12px;display:flex;justify-content:space-between;font-size:12px;"><span>自动化测试实战</span><span>45%</span></div>
+                        <div class="progress-bar"><div class="fill fill-green" style="width:45%;"></div></div>
+                        <div style="margin-top:12px;display:flex;justify-content:space-between;font-size:12px;"><span>Python 全栈</span><span>90%</span></div>
+                        <div class="progress-bar"><div class="fill fill-orange" style="width:90%;"></div></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">🤖 AI 助手</span><span class="tag tag-purple">GPT-4</span></div>
+                        <div class="chat-area" id="dashChat" style="max-height:180px;">
+                            <div class="chat-msg ai">你好！我是 DevSmart AI 助手。有什么学习或开发问题可以问我？</div>
+                        </div>
+                        <div class="chat-input-row" style="margin-top:8px;">
+                            <input type="text" class="input" id="dashChatInput" placeholder="输入问题..." style="flex:1;">
+                            <button class="btn btn-primary btn-sm" onclick="sendDashChat()">发送</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== 学习中心页面 ========== -->
+            <div class="page" id="page-learn">
+                <h2 style="font-weight:700;font-size:22px;">🎓 学习中心</h2>
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">📺 视频学习区</span><span class="tag tag-green">跟随输入模式</span></div>
+                        <div class="video-container" onclick="showToast('视频播放器启动中...','info')">
+                            <div class="video-overlay">
+                                <div class="play-btn"><i class="fa-solid fa-play"></i></div>
+                            </div>
+                            <div style="position:absolute;bottom:16px;left:16px;color:#fff;font-weight:600;font-size:14px;z-index:3;">React 18 新特性深度解析</div>
+                            <div style="position:absolute;bottom:16px;right:16px;color:#ccc;font-size:11px;z-index:3;">⏱ 32:15</div>
+                        </div>
+                        <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+                            <span class="tag tag-blue">React</span><span class="tag tag-purple">前端</span><span class="tag tag-orange">中级</span>
+                        </div>
+                        <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">来源：抓取自 Udemy · 评分 4.8</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">💻 跟随输入练习</span><span class="tag tag-cyan" style="background:rgba(6,182,212,0.15);color:#22d3ee;">在线编辑器</span></div>
+                        <div class="editor-container">
+                            <div class="editor-header">
+                                <span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+                                <span style="margin-left:8px;">main.js</span>
+                                <span class="tag tag-blue" style="margin-left:auto;">JavaScript</span>
+                            </div>
+                            <div id="monaco-editor"></div>
+                        </div>
+                        <div style="margin-top:10px;display:flex;gap:8px;">
+                            <button class="btn btn-primary btn-sm" onclick="runCode()">▶ 运行代码</button>
+                            <button class="btn btn-outline btn-sm" onclick="showToast('代码已保存','success')">💾 保存</button>
+                            <select class="input btn-sm" style="width:auto;padding:6px 28px 6px 10px;" id="languageSelect" onchange="changeLanguage()">
+                                <option value="javascript">JavaScript</option>
+                                <option value="typescript">TypeScript</option>
+                                <option value="python">Python</option>
+                                <option value="java">Java</option>
+                                <option value="go">Go</option>
+                                <option value="rust">Rust</option>
+                            </select>
+                        </div>
+                        <div id="codeOutput" style="margin-top:10px;padding:12px;background:#0d1117;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#34d399;max-height:120px;overflow-y:auto;display:none;"></div>
+                    </div>
+                </div>
+                <!-- AI出题快捷入口 -->
+                <div class="card" style="background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(59,130,246,0.08));border-color:rgba(139,92,246,0.3);">
+                    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+                        <i class="fa-solid fa-robot" style="font-size:40px;color:var(--accent-purple);"></i>
+                        <div style="flex:1;min-width:200px;">
+                            <strong>🤖 AI 大模型出题</strong>
+                            <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">根据当前学习课程自动生成考试题目，支持单选、多选、编程题</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="switchPage('exam')">立即生成考题 →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== 模拟上班页面 ========== -->
+            <div class="page" id="page-work">
+                <h2 style="font-weight:700;font-size:22px;">💼 模拟上班模式</h2>
+                <div class="card">
+                    <div class="card-header"><span class="card-title">选择你的职业角色</span></div>
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;" id="roleSelector">
+                        <button class="btn btn-outline btn-lg role-btn active" data-role="fullstack" style="flex:1;min-width:140px;justify-content:center;">
+                            <i class="fa-solid fa-layer-group"></i> 全栈开发
+                        </button>
+                        <button class="btn btn-outline btn-lg role-btn" data-role="qa" style="flex:1;min-width:140px;justify-content:center;">
+                            <i class="fa-solid fa-bug"></i> 普通测试
+                        </button>
+                        <button class="btn btn-outline btn-lg role-btn" data-role="sdet" style="flex:1;min-width:140px;justify-content:center;">
+                            <i class="fa-solid fa-shield-halved"></i> 测试开发
+                        </button>
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="card" id="workTaskCard">
+                        <div class="card-header"><span class="card-title">📋 今日任务</span><span class="tag tag-orange" id="roleTag">全栈开发</span></div>
+                        <div id="taskList">
+                            <div style="padding:10px;border-bottom:1px solid var(--border-color);font-size:13px;">🔨 完成用户认证模块开发</div>
+                            <div style="padding:10px;border-bottom:1px solid var(--border-color);font-size:13px;">📝 编写 RESTful API 文档</div>
+                            <div style="padding:10px;border-bottom:1px solid var(--border-color);font-size:13px;">🐛 修复 Dashboard 页面 Bug</div>
+                            <div style="padding:10px;font-size:13px;">✅ 代码审查 PR #142</div>
+                        </div>
+                        <button class="btn btn-green btn-sm" style="margin-top:12px;" onclick="showToast('任务已打卡！','success')">✅ 打卡完成</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">⏰ 模拟工作时钟</span></div>
+                        <div style="text-align:center;font-size:48px;font-weight:800;letter-spacing:-2px;" id="workClock">09:30:00</div>
+                        <div style="text-align:center;color:var(--text-muted);font-size:12px;">模拟工作时间 · 专注计时中</div>
+                        <div style="display:flex;gap:10px;margin-top:16px;justify-content:center;">
+                            <button class="btn btn-primary btn-sm" onclick="startWorkClock()">▶ 开始工作</button>
+                            <button class="btn btn-outline btn-sm" onclick="stopWorkClock()">⏸ 暂停</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== AI考试中心页面 ========== -->
+            <div class="page" id="page-exam">
+                <h2 style="font-weight:700;font-size:22px;">📝 AI 考试中心</h2>
+                <div class="card">
+                    <div class="card-header"><span class="card-title">生成考试</span></div>
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:end;">
+                        <div style="flex:1;min-width:180px;">
+                            <label style="font-size:11px;color:var(--text-muted);">选择课程来源</label>
+                            <select class="input" id="examCourseSelect">
+                                <option>React 18 新特性深度解析</option>
+                                <option>自动化测试实战 (Playwright)</option>
+                                <option>Python 全栈开发</option>
+                                <option>Java Spring Boot 微服务</option>
+                                <option>Go 语言高并发编程</option>
+                            </select>
+                        </div>
+                        <div style="flex:1;min-width:120px;">
+                            <label style="font-size:11px;color:var(--text-muted);">题目数量</label>
+                            <select class="input" id="examCount">
+                                <option>5 题</option><option>10 题</option><option>15 题</option><option>20 题</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="generateExam()" style="height:42px;">🤖 AI 生成考题</button>
+                    </div>
+                </div>
+                <div id="examArea">
+                    <div class="card" style="text-align:center;padding:40px;">
+                        <i class="fa-solid fa-robot" style="font-size:48px;color:var(--text-muted);"></i>
+                        <p style="color:var(--text-muted);margin-top:12px;">点击上方按钮，AI 将根据课程内容自动生成考试题目</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== 在线实操页面 ========== -->
+            <div class="page" id="page-practice">
+                <h2 style="font-weight:700;font-size:22px;">🛠 在线实操 · 抓取项目</h2>
+                <div class="grid-3">
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">📦 电商后台系统</span><span class="tag tag-green">全栈</span></div>
+                        <p style="font-size:12px;color:var(--text-muted);">React + Node.js + MongoDB 完整电商后台</p>
+                        <div style="margin-top:8px;font-size:11px;">⭐ 4.9 · 抓取自 GitHub</div>
+                        <button class="btn btn-outline btn-sm" style="margin-top:10px;" onclick="showToast('项目已克隆到实操环境','success')">🚀 开始实操</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">🧪 自动化测试框架</span><span class="tag tag-purple">测试</span></div>
+                        <p style="font-size:12px;color:var(--text-muted);">Playwright + Pytest 企业级测试框架</p>
+                        <div style="margin-top:8px;font-size:11px;">⭐ 4.7 · 抓取自 GitLab</div>
+                        <button class="btn btn-outline btn-sm" style="margin-top:10px;" onclick="showToast('项目已克隆到实操环境','success')">🚀 开始实操</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">🔧 DevOps 工具链</span><span class="tag tag-orange">运维</span></div>
+                        <p style="font-size:12px;color:var(--text-muted);">Docker + K8s + CI/CD 完整流水线</p>
+                        <div style="margin-top:8px;font-size:11px;">⭐ 4.8 · 抓取自 GitHub</div>
+                        <button class="btn btn-outline btn-sm" style="margin-top:10px;" onclick="showToast('项目已克隆到实操环境','success')">🚀 开始实操</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== 兼职广场页面 ========== -->
+            <div class="page" id="page-jobs">
+                <h2 style="font-weight:700;font-size:22px;">💼 兼职广场 · 专属开发兼职</h2>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
+                    <select class="input" style="width:auto;flex:1;min-width:150px;">
+                        <option>全部类型</option><option>全栈开发</option><option>前端开发</option><option>测试工程师</option><option>DevOps</option>
+                    </select>
+                    <button class="btn btn-primary btn-sm">🔍 筛选</button>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:10px;" id="jobList">
+                    <div class="job-card">
+                        <div class="job-avatar" style="background:rgba(59,130,246,0.2);color:#60a5fa;">R</div>
+                        <div style="flex:1;"><strong>React 前端兼职开发</strong><p style="font-size:11px;color:var(--text-muted);">远程 · $40-60/hr · 发布于2小时前</p></div>
+                        <span class="tag tag-green">急聘</span>
+                        <button class="btn btn-primary btn-sm">申请</button>
+                    </div>
+                    <div class="job-card">
+                        <div class="job-avatar" style="background:rgba(16,185,129,0.2);color:#34d399;">T</div>
+                        <div style="flex:1;"><strong>自动化测试脚本编写</strong><p style="font-size:11px;color:var(--text-muted);">兼职 · ¥300-500/天 · 发布于5小时前</p></div>
+                        <span class="tag tag-blue">测试开发</span>
+                        <button class="btn btn-primary btn-sm">申请</button>
+                    </div>
+                    <div class="job-card">
+                        <div class="job-avatar" style="background:rgba(245,158,11,0.2);color:#fbbf24;">F</div>
+                        <div style="flex:1;"><strong>全栈开发者 (Freelance)</strong><p style="font-size:11px;color:var(--text-muted);">远程 · $50-80/hr · 发布于1天前</p></div>
+                        <span class="tag tag-orange">全栈</span>
+                        <button class="btn btn-primary btn-sm">申请</button>
+                    </div>
+                    <div class="job-card">
+                        <div class="job-avatar" style="background:rgba(139,92,246,0.2);color:#a78bfa;">D</div>
+                        <div style="flex:1;"><strong>DevOps 兼职顾问</strong><p style="font-size:11px;color:var(--text-muted);">混合 · ¥800/天 · 发布于2天前</p></div>
+                        <span class="tag tag-purple">DevOps</span>
+                        <button class="btn btn-primary btn-sm">申请</button>
+                    </div>
+                </div>
+                <p style="font-size:11px;color:var(--text-muted);text-align:center;">数据来源：Upwork / 猪八戒 / 程序员客栈 · 实时抓取</p>
+            </div>
+
+            <!-- ========== 课程抓取页面 ========== -->
+            <div class="page" id="page-courses">
+                <h2 style="font-weight:700;font-size:22px;">📚 课程抓取</h2>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    <input type="text" class="input" placeholder="搜索课程关键词..." style="flex:1;min-width:200px;">
+                    <button class="btn btn-primary">🔍 抓取课程</button>
+                </div>
+                <div class="grid-3" style="margin-top:8px;">
+                    <div class="card"><strong>React 18 新特性</strong><p style="font-size:11px;color:var(--text-muted);">Udemy · 4.8⭐ · 32课时</p><span class="tag tag-blue">前端</span></div>
+                    <div class="card"><strong>Playwright 自动化测试</strong><p style="font-size:11px;color:var(--text-muted);">Coursera · 4.7⭐ · 28课时</p><span class="tag tag-purple">测试</span></div>
+                    <div class="card"><strong>Spring Boot 微服务</strong><p style="font-size:11px;color:var(--text-muted);">B站 · 4.9⭐ · 45课时</p><span class="tag tag-green">后端</span></div>
+                </div>
+            </div>
+
+            <!-- ========== 规划书页面 ========== -->
+            <div class="page" id="page-roadmaps">
+                <h2 style="font-weight:700;font-size:22px;">🗺 学习规划书</h2>
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">全栈开发学习路线</span><span class="tag tag-blue">热门</span></div>
+                        <div style="font-size:12px;line-height:2;">
+                            📍 HTML/CSS → JavaScript → React → Node.js → 数据库 → DevOps
+                        </div>
+                        <div class="progress-bar" style="margin-top:8px;"><div class="fill fill-blue" style="width:65%;"></div></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">测试开发进阶路线</span><span class="tag tag-purple">推荐</span></div>
+                        <div style="font-size:12px;line-height:2;">
+                            📍 测试基础 → 自动化框架 → CI/CD → 性能测试 → 安全测试
+                        </div>
+                        <div class="progress-bar" style="margin-top:8px;"><div class="fill fill-green" style="width:40%;"></div></div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /content-area -->
+    </div><!-- /main-area -->
+
+    <!-- Toast容器 -->
+    <div id="toastContainer"></div>
+
+    <!-- Monaco Editor 加载器 -->
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
+    <script>
+        // ==================== 全局状态 ====================
+        const APP_STATE = {
+            currentMode: 'learn-mode', // 'learn-mode' | 'work-mode'
+            currentPage: 'dashboard',
+            workRole: 'fullstack', // 'fullstack' | 'qa' | 'sdet'
+            workClockInterval: null,
+            workClockRunning: false,
+            workClockSeconds: 0,
+        };
+
+        // ==================== Toast ====================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+
+        // ==================== 页面切换 ====================
+        function switchPage(pageName) {
+            APP_STATE.currentPage = pageName;
+            // 更新侧边栏
+            document.querySelectorAll('#sidebarNav .nav-item').forEach(item => item.classList.remove('active'));
+            const navItem = document.querySelector(`#sidebarNav .nav-item[data-page="${pageName}"]`);
+            if (navItem) navItem.classList.add('active');
+            // 更新页面
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const pageEl = document.getElementById(`page-${pageName}`);
+            if (pageEl) pageEl.classList.add('active');
+            // 滚动到顶部
+            document.getElementById('contentArea').scrollTop = 0;
+            // 如果切换到学习页面，刷新编辑器布局
+            if (pageName === 'learn' && window.monacoEditor) {
+                setTimeout(() => window.monacoEditor.layout(), 200);
+            }
+        }
+
+        // 侧边栏点击事件
+        document.getElementById('sidebarNav').addEventListener('click', function(e) {
+            const navItem = e.target.closest('.nav-item');
+            if (!navItem) return;
+            e.preventDefault();
+            const pageName = navItem.getAttribute('data-page');
+            if (pageName) switchPage(pageName);
+            // 移动端关闭侧边栏
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('open');
+            }
+        });
+
+        // 汉堡菜单
+        document.getElementById('hamburgerBtn').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+
+        // ==================== 模式切换 ====================
+        document.getElementById('modeSwitch').addEventListener('click', function(e) {
+            const btn = e.target.closest('.mode-btn');
+            if (!btn) return;
+            const mode = btn.getAttribute('data-mode');
+            APP_STATE.currentMode = mode;
+            document.querySelectorAll('#modeSwitch .mode-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const label = document.getElementById('currentModeLabel');
+            if (mode === 'work-mode') {
+                label.textContent = '当前：上班模式';
+                switchPage('work');
+            } else {
+                label.textContent = '当前：学习模式';
+                switchPage('learn');
+            }
+            showToast(mode === 'work-mode' ? '已切换到 💼 模拟上班模式' : '已切换到 🎓 学习模式', 'info');
+        });
+
+        // ==================== 职业角色切换 ====================
+        document.getElementById('roleSelector')?.addEventListener('click', function(e) {
+            const btn = e.target.closest('.role-btn');
+            if (!btn) return;
+            document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            APP_STATE.workRole = btn.getAttribute('data-role');
+            const roleTag = document.getElementById('roleTag');
+            const taskList = document.getElementById('taskList');
+            const roleNames = { fullstack: '全栈开发', qa: '普通测试', sdet: '测试开发' };
+            const tasks = {
+                fullstack: [
+                    '🔨 完成用户认证模块开发',
+                    '📝 编写 RESTful API 文档',
+                    '🐛 修复 Dashboard 页面 Bug',
+                    '✅ 代码审查 PR #142',
+                ],
+                qa: [
+                    '🧪 编写测试用例 (Login模块)',
+                    '🐞 执行回归测试套件',
+                    '📋 提交 Bug 报告 #237',
+                    '✅ 验证修复 Bug #198',
+                ],
+                sdet: [
+                    '🤖 搭建自动化测试框架',
+                    '📊 编写性能测试脚本',
+                    '🔧 优化 CI/CD 测试流水线',
+                    '✅ 代码覆盖率报告分析',
+                ],
+            };
+            if (roleTag) roleTag.textContent = roleNames[APP_STATE.workRole] || '全栈开发';
+            if (taskList && tasks[APP_STATE.workRole]) {
+                taskList.innerHTML = tasks[APP_STATE.workRole]
+                    .map(t => `<div style="padding:10px;border-bottom:1px solid var(--border-color);font-size:13px;">${t}</div>`)
+                    .join('');
+            }
+            showToast(`角色已切换：${roleNames[APP_STATE.workRole]}`, 'info');
+        });
+
+        // ==================== 工作时钟 ====================
+        function updateWorkClockDisplay() {
+            const sec = APP_STATE.workClockSeconds;
+            const h = Math.floor(sec / 3600);
+            const m = Math.floor((sec % 3600) / 60);
+            const s = sec % 60;
+            const display = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            const clockEl = document.getElementById('workClock');
+            if (clockEl) clockEl.textContent = display;
+        }
+
+        function startWorkClock() {
+            if (APP_STATE.workClockRunning) return;
+            APP_STATE.workClockRunning = true;
+            if (APP_STATE.workClockSeconds === 0) {
+                // 默认从9:30开始
+                APP_STATE.workClockSeconds = 9 * 3600 + 30 * 60;
+            }
+            updateWorkClockDisplay();
+            APP_STATE.workClockInterval = setInterval(() => {
+                APP_STATE.workClockSeconds++;
+                updateWorkClockDisplay();
+            }, 1000);
+            showToast('工作时钟已启动 ⏰', 'success');
+        }
+
+        function stopWorkClock() {
+            APP_STATE.workClockRunning = false;
+            if (APP_STATE.workClockInterval) {
+                clearInterval(APP_STATE.workClockInterval);
+                APP_STATE.workClockInterval = null;
+            }
+            showToast('工作时钟已暂停', 'info');
+        }
+
+        // ==================== AI 生成考试 ====================
+        function generateExam() {
+            const course = document.getElementById('examCourseSelect')?.value || 'React 18 新特性';
+            const countText = document.getElementById('examCount')?.value || '5 题';
+            const count = parseInt(countText);
+            const examArea = document.getElementById('examArea');
+            if (!examArea) return;
+
+            // 模拟AI生成的考题
+            const mockQuestions = [
+                { q: 'React 18 中引入的并发特性叫什么？', options: ['Concurrent Mode', 'Parallel Mode', 'Async Mode',
+                        'Streaming Mode'
+                    ], answer: 0 },
+                { q: '以下哪个 Hook 用于处理副作用？', options: ['useState', 'useEffect', 'useContext', 'useReducer'],
+                    answer: 1 },
+                { q: 'TypeScript 中 interface 和 type 的主要区别是？', options: ['没有区别', 'interface 可被扩展',
+                        'type 更强大', 'interface 更快'
+                    ], answer: 1 },
+                { q: 'Playwright 支持哪些浏览器？', options: ['仅Chrome', 'Chrome+Firefox',
+                        'Chrome+Firefox+WebKit', '所有浏览器'], answer: 2 },
+                { q: 'Docker 的核心概念不包括？', options: ['Image', 'Container', 'Virtual Machine', 'Dockerfile'],
+                    answer: 2 },
+                { q: 'RESTful API 中 GET 请求应该用于？', options: ['创建资源', '获取资源', '更新资源', '删除资源'], answer: 1 },
+                { q: 'Git 中合并分支的命令是？', options: ['git push', 'git merge', 'git pull', 'git commit'],
+                answer: 1 },
+                { q: '以下哪个是 NoSQL 数据库？', options: ['MySQL', 'PostgreSQL', 'MongoDB', 'SQLite'], answer: 2 },
+                { q: 'CI/CD 中 CI 代表什么？', options: ['Continuous Integration', 'Code Integration',
+                        'Central Integration', 'Cloud Integration'
+                    ], answer: 0 },
+                { q: 'Python 中列表推导式的符号是？', options: ['()', '[]', '{}', '<>'], answer: 1 },
+            ];
+
+            const selectedQuestions = mockQuestions.slice(0, Math.min(count, mockQuestions.length));
+            let examHTML = '<div class="card"><div class="card-header"><span class="card-title">📝 ' + course +
+                ' - 考试</span><span class="tag tag-orange">AI生成 · ' + selectedQuestions.length +
+                '题</span></div>';
+
+            selectedQuestions.forEach((q, i) => {
+                examHTML += `
+                <div class="exam-card" id="exam-q-${i}">
+                    <strong>第${i+1}题：${q.q}</strong>
+                    <div style="margin-top:8px;">
+                        ${q.options.map((opt, oi) => `
+                            <label class="exam-option" data-q="${i}" data-o="${oi}" onclick="selectExamOption(this, ${i}, ${oi}, ${q.answer})">
+                                ${String.fromCharCode(65+oi)}. ${opt}
+                            </label>
+                        `).join('')}
+                    </div>
+                    <div id="exam-result-${i}" style="margin-top:6px;font-size:12px;font-weight:600;display:none;"></div>
+                </div>`;
+            });
+
+            examHTML +=
+                '<button class="btn btn-primary" style="margin-top:12px;" onclick="submitExam()">📩 提交答卷</button></div>';
+            examArea.innerHTML = examHTML;
+            showToast(`AI 已生成 ${selectedQuestions.length} 道考题`, 'success');
+        }
+
+        function selectExamOption(labelEl, qIndex, oIndex, correctAnswer) {
+            const allOptions = document.querySelectorAll(`.exam-option[data-q="${qIndex}"]`);
+            allOptions.forEach(o => o.classList.remove('selected'));
+            labelEl.classList.add('selected');
+            // 存储选择
+            labelEl.parentElement.setAttribute('data-selected', oIndex);
+            labelEl.parentElement.setAttribute('data-correct', correctAnswer);
+        }
+
+        function submitExam() {
+            let score = 0;
+            let total = 0;
+            document.querySelectorAll('.exam-card').forEach((card, i) => {
+                const selected = card.querySelector('.exam-option.selected');
+                const correctAnswer = parseInt(card.getAttribute('data-correct') || '0');
+                const resultDiv = document.getElementById(`exam-result-${i}`);
+                total++;
+                if (selected) {
+                    const selectedO = parseInt(selected.getAttribute('data-o'));
+                    if (selectedO === correctAnswer) {
+                        score++;
+                        if (resultDiv) {
+                            resultDiv.textContent = '✅ 正确！';
+                            resultDiv.style.color = '#34d399';
+                            resultDiv.style.display = 'block';
+                        }
+                        selected.classList.add('correct');
+                    } else {
+                        if (resultDiv) {
+                            resultDiv.textContent = '❌ 错误！正确答案是 ' + String.fromCharCode(65 + correctAnswer);
+                            resultDiv.style.color = '#ef4444';
+                            resultDiv.style.display = 'block';
+                        }
+                        selected.classList.add('wrong');
+                        // 高亮正确答案
+                        const correctOpt = card.querySelector(`.exam-option[data-o="${correctAnswer}"]`);
+                        if (correctOpt) correctOpt.classList.add('correct');
+                    }
+                } else {
+                    if (resultDiv) {
+                        resultDiv.textContent = '⚠ 未作答';
+                        resultDiv.style.color = '#f59e0b';
+                        resultDiv.style.display = 'block';
+                    }
+                }
+                // 禁用所有选项
+                card.querySelectorAll('.exam-option').forEach(o => o.style.pointerEvents = 'none');
+            });
+            const percentage = Math.round((score / total) * 100);
+            showToast(`考试完成！得分：${score}/${total} (${percentage}%)`, percentage >= 60 ? 'success' : 'error');
+        }
+
+        // ==================== 仪表盘聊天 ====================
+        function sendDashChat() {
+            const input = document.getElementById('dashChatInput');
+            const chatArea = document.getElementById('dashChat');
+            if (!input || !chatArea) return;
+            const msg = input.value.trim();
+            if (!msg) return;
+            // 用户消息
+            chatArea.innerHTML += `<div class="chat-msg user">${escapeHtml(msg)}</div>`;
+            input.value = '';
+            // AI回复
+            setTimeout(() => {
+                const replies = [
+                    '这是个好问题！根据最新的文档，React 18 的并发特性可以显著提升用户体验。',
+                    '建议你查看官方文档中关于 Suspense 的部分，那里有详细解释。',
+                    '对于测试方面，我推荐使用 Playwright 进行端到端测试，它支持多浏览器。',
+                    '全栈开发中，建议先掌握前后端基础，再逐步深入到 DevOps 领域。',
+                ];
+                const reply = replies[Math.floor(Math.random() * replies.length)];
+                chatArea.innerHTML += `<div class="chat-msg ai">${reply}</div>`;
+                chatArea.scrollTop = chatArea.scrollHeight;
+            }, 600 + Math.random() * 800);
+        }
+        document.getElementById('dashChatInput')?.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') sendDashChat();
+        });
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // ==================== 代码运行模拟 ====================
+        function runCode() {
+            const outputEl = document.getElementById('codeOutput');
+            if (!outputEl) return;
+            outputEl.style.display = 'block';
+            const lang = document.getElementById('languageSelect')?.value || 'javascript';
+            const outputs = {
+                javascript: '> Hello, DevSmart!\n> 代码运行成功！\n> 输出: "React 18 Concurrent Mode activated."',
+                typescript: '> TypeScript 编译通过 ✅\n> 类型检查完成，0 errors\n> 运行结果: [1,2,3,4,5]',
+                python: '>>> Python 3.11 执行中...\n>>> Hello World!\n>>> 数据处理完成，共1000条记录',
+                java: '> javac Main.java\n> java Main\n> Build successful\n> Output: Spring Boot started on port 8080',
+                go: '> go run main.go\n> Server listening on :3000\n> Goroutines: 4 active',
+                rust: '> cargo run\n> Compiling...\n> Finished dev build\n> Hello from Rust!',
+            };
+            outputEl.textContent = outputs[lang] || outputs['javascript'];
+            showToast('代码运行完成 ✅', 'success');
+        }
+
+        function changeLanguage() {
+            const lang = document.getElementById('languageSelect')?.value;
+            if (window.monacoEditor && lang) {
+                const langMap = {
+                    javascript: 'javascript',
+                    typescript: 'typescript',
+                    python: 'python',
+                    java: 'java',
+                    go: 'go',
+                    rust: 'rust',
+                };
+                const monacoLang = langMap[lang] || 'javascript';
+                monaco.editor.setModelLanguage(window.monacoEditor.getModel(), monacoLang);
+                showToast(`语言已切换至 ${lang}`, 'info');
+            }
+        }
+
+        // ==================== Monaco Editor 初始化 ====================
+        let monacoEditorInstance = null;
+        require.config({
+            paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs' }
+        });
+        require(['vs/editor/editor.main'], function() {
+            const editorEl = document.getElementById('monaco-editor');
+            if (!editorEl) return;
+            monacoEditorInstance = monaco.editor.create(editorEl, {
+                value: `// 欢迎使用 DevSmart 在线编辑器 🚀\n// 支持 JavaScript, TypeScript, Python, Java, Go, Rust\n\nfunction greet(name) {\n  console.log("Hello, " + name + "!");\n  console.log("Welcome to DevSmart Platform v1.0.1");\n}\n\ngreet("开发者");\n\n// 提示：学习模式下可一边看视频一边在此输入练习`,
+                language: 'javascript',
+                theme: 'vs-dark',
+                fontSize: 13,
+                fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+                minimap: { enabled: false },
+                automaticLayout: true,
+                scrollBeyondLastLine: false,
+                lineNumbers: 'on',
+                renderLineHighlight: 'line',
+                cursorBlinking: 'smooth',
+                smoothScrolling: true,
+                padding: { top: 12, bottom: 12 },
+            });
+            window.monacoEditor = monacoEditorInstance;
+            // 初始布局
+            setTimeout(() => monacoEditorInstance.layout(), 300);
+        });
+
+        // 窗口大小变化时刷新编辑器
+        window.addEventListener('resize', () => {
+            if (window.monacoEditor) {
+                setTimeout(() => window.monacoEditor.layout(), 150);
+            }
+        });
+
+        // ==================== 初始化 ====================
+        function init() {
+            updateWorkClockDisplay();
+            // 默认显示仪表盘
+            switchPage('dashboard');
+            console.log('🚀 DevSmart Platform v1.0.1 已就绪');
+            console.log('📦 可通过GitHub打包部署');
+            console.log('🎓 学习模式 | 💼 上班模式 | 🤖 AI考试 | 🛠 实操 | 💼 兼职广场');
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', init);
+
+        // ==================== 全局函数暴露 ====================
+        window.switchPage = switchPage;
+        window.showToast = showToast;
+        window.sendDashChat = sendDashChat;
+        window.generateExam = generateExam;
+        window.selectExamOption = selectExamOption;
+        window.submitExam = submitExam;
+        window.runCode = runCode;
+        window.changeLanguage = changeLanguage;
+        window.startWorkClock = startWorkClock;
+        window.stopWorkClock = stopWorkClock;
+    </script>
+</body>
+</html>
