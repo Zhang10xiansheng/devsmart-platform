@@ -3,16 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevSmart Platform - 开发智慧平台 v1.0.2</title>
+    <title>DevSmart Platform - 开发智慧平台 v1.0.1</title>
 
+    <!-- 字体与图标 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Monaco Editor -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/editor/editor.main.css">
 
     <style>
         :root {
+            .hidden { display: none !important; }
             --bg-primary: #0a0e14;
             --bg-secondary: #12171f;
             --bg-tertiary: #1a1f2b;
@@ -43,11 +46,13 @@
             --sidebar-width: 260px;
             --header-height: 56px;
         }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background: var(--bg-primary);
@@ -55,8 +60,11 @@
             height: 100vh;
             overflow: hidden;
             display: flex;
+            user-select: none;
             -webkit-font-smoothing: antialiased;
         }
+
+        /* ========== 侧边栏 ========== */
         .sidebar {
             width: var(--sidebar-width);
             height: 100vh;
@@ -66,6 +74,7 @@
             flex-direction: column;
             flex-shrink: 0;
             z-index: 100;
+            transition: transform var(--transition-normal);
         }
         .sidebar-logo {
             padding: 20px 20px 16px;
@@ -176,6 +185,8 @@
             color: #fff;
             font-size: 14px;
         }
+
+        /* ========== 主区域 ========== */
         .main-area {
             flex: 1;
             display: flex;
@@ -195,14 +206,14 @@
             flex-shrink: 0;
             z-index: 50;
         }
-        .mode-switch {
+        .topbar .mode-switch {
             display: flex;
             background: var(--bg-tertiary);
             border-radius: 30px;
             padding: 4px;
             gap: 2px;
         }
-        .mode-btn {
+        .topbar .mode-btn {
             padding: 8px 18px;
             border-radius: 26px;
             cursor: pointer;
@@ -213,20 +224,25 @@
             border: none;
             background: transparent;
             white-space: nowrap;
+            letter-spacing: -0.2px;
         }
-        .mode-btn.active {
+        .topbar .mode-btn.active {
             background: var(--accent-blue);
             color: #fff;
             font-weight: 600;
             box-shadow: var(--shadow-md);
         }
-        .topbar-right {
+        .topbar .mode-btn:hover:not(.active) {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .topbar .topbar-right {
             margin-left: auto;
             display: flex;
             align-items: center;
             gap: 14px;
         }
-        .icon-btn {
+        .topbar .icon-btn {
             width: 36px;
             height: 36px;
             border-radius: 50%;
@@ -240,6 +256,10 @@
             transition: all var(--transition-fast);
             font-size: 15px;
         }
+        .topbar .icon-btn:hover {
+            color: #fff;
+            background: var(--border-color);
+        }
         .content-area {
             flex: 1;
             overflow-y: auto;
@@ -248,12 +268,28 @@
             flex-direction: column;
             gap: 20px;
         }
+        .content-area::-webkit-scrollbar {
+            width: 5px;
+        }
+        .content-area::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .content-area::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 10px;
+        }
+
+        /* ========== 卡片 ========== */
         .card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
             padding: 20px;
             transition: all var(--transition-normal);
+        }
+        .card:hover {
+            border-color: #334155;
+            box-shadow: var(--shadow-md);
         }
         .card-header {
             display: flex;
@@ -264,7 +300,14 @@
         .card-title {
             font-weight: 700;
             font-size: 16px;
+            letter-spacing: -0.3px;
         }
+        .card-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ========== 网格 ========== */
         .grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -287,13 +330,32 @@
             .grid-4 {
                 grid-template-columns: 1fr 1fr;
             }
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
         }
+        @media (max-width: 768px) {
+            .grid-3,
+            .grid-4 {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                position: fixed;
+                left: -280px;
+            }
+            .sidebar.open {
+                left: 0;
+            }
+        }
+
+        /* ========== 标签 ========== */
         .tag {
             display: inline-block;
             padding: 4px 10px;
             border-radius: 20px;
             font-size: 11px;
             font-weight: 500;
+            letter-spacing: 0.1px;
         }
         .tag-blue {
             background: rgba(59, 130, 246, 0.15);
@@ -307,6 +369,16 @@
             background: rgba(245, 158, 11, 0.15);
             color: #fbbf24;
         }
+        .tag-purple {
+            background: rgba(139, 92, 246, 0.15);
+            color: #a78bfa;
+        }
+        .tag-pink {
+            background: rgba(236, 72, 153, 0.15);
+            color: #f472b6;
+        }
+
+        /* ========== 按钮 ========== */
         .btn {
             padding: 9px 18px;
             border-radius: var(--radius-sm);
@@ -314,25 +386,54 @@
             cursor: pointer;
             font-weight: 600;
             font-size: 13px;
+            letter-spacing: -0.2px;
             transition: all var(--transition-fast);
             display: inline-flex;
             align-items: center;
             gap: 7px;
+            white-space: nowrap;
             font-family: inherit;
         }
         .btn-primary {
             background: var(--accent-blue);
             color: #fff;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+        .btn-primary:hover {
+            background: #2563eb;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.45);
+            transform: translateY(-1px);
         }
         .btn-outline {
             background: transparent;
             border: 1px solid var(--border-color);
             color: var(--text-secondary);
         }
+        .btn-outline:hover {
+            border-color: var(--accent-blue);
+            color: #fff;
+            background: rgba(59, 130, 246, 0.05);
+        }
         .btn-sm {
             padding: 6px 12px;
             font-size: 11px;
+            border-radius: 4px;
         }
+        .btn-lg {
+            padding: 12px 24px;
+            font-size: 15px;
+            border-radius: var(--radius-md);
+        }
+        .btn-green {
+            background: var(--accent-green);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+        .btn-green:hover {
+            background: #059669;
+        }
+
+        /* ========== 输入框 ========== */
         .input {
             background: var(--bg-input);
             border: 1px solid var(--border-color);
@@ -343,6 +444,14 @@
             font-family: inherit;
             width: 100%;
             outline: none;
+            transition: all var(--transition-fast);
+        }
+        .input:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .input::placeholder {
+            color: var(--text-muted);
         }
         textarea.input {
             resize: vertical;
@@ -350,21 +459,119 @@
         }
         select.input {
             cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
         }
+
+        /* ========== 进度条 ========== */
         .progress-bar {
             height: 6px;
             background: var(--bg-tertiary);
             border-radius: 10px;
             overflow: hidden;
         }
+        .progress-bar .fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
         .fill-blue {
             background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
         }
+        .fill-green {
+            background: linear-gradient(90deg, var(--accent-green), #34d399);
+        }
+        .fill-orange {
+            background: linear-gradient(90deg, var(--accent-orange), #fbbf24);
+        }
+
+        /* ========== 视频区 ========== */
+        .video-container {
+            background: #000;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 16/9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+        .video-container .play-btn {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #000;
+            transition: all var(--transition-normal);
+            z-index: 2;
+        }
+        .video-container:hover .play-btn {
+            transform: scale(1.1);
+            background: #fff;
+        }
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ========== 代码编辑器容器 ========== */
+        .editor-container {
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            background: #0d1117;
+            min-height: 300px;
+            position: relative;
+        }
+        .editor-container .editor-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: #161b22;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .editor-container .editor-header .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .dot-red {
+            background: #ef4444;
+        }
+        .dot-yellow {
+            background: #f59e0b;
+        }
+        .dot-green {
+            background: #10b981;
+        }
+        #monaco-editor {
+            height: 350px;
+            width: 100%;
+        }
+
+        /* ========== 聊天/AI区 ========== */
         .chat-area {
             display: flex;
             flex-direction: column;
             gap: 12px;
-            max-height: 300px;
+            max-height: 400px;
             overflow-y: auto;
         }
         .chat-msg {
@@ -373,26 +580,48 @@
             font-size: 13px;
             line-height: 1.6;
             max-width: 85%;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         .chat-msg.ai {
             background: var(--bg-tertiary);
             align-self: flex-start;
+            border-bottom-left-radius: 4px;
         }
         .chat-msg.user {
             background: var(--accent-blue);
             color: #fff;
             align-self: flex-end;
+            border-bottom-right-radius: 4px;
         }
         .chat-input-row {
             display: flex;
             gap: 10px;
         }
+        .chat-input-row .input {
+            flex: 1;
+        }
+
+        /* ========== 考试卡片 ========== */
         .exam-card {
             border-left: 3px solid var(--accent-orange);
             padding: 14px 18px;
             background: var(--bg-tertiary);
             border-radius: 0 var(--radius-md) var(--radius-md) 0;
             margin-bottom: 10px;
+            transition: all var(--transition-fast);
+        }
+        .exam-card:hover {
+            border-left-color: var(--accent-blue);
         }
         .exam-option {
             display: block;
@@ -400,9 +629,14 @@
             margin: 4px 0;
             border-radius: var(--radius-sm);
             cursor: pointer;
+            transition: all var(--transition-fast);
             font-size: 13px;
             border: 1px solid transparent;
             background: var(--bg-card);
+        }
+        .exam-option:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--border-color);
         }
         .exam-option.selected {
             border-color: var(--accent-blue);
@@ -417,6 +651,8 @@
             border-color: var(--accent-red) !important;
             background: rgba(239, 68, 68, 0.1) !important;
         }
+
+        /* ========== 兼职列表 ========== */
         .job-card {
             display: flex;
             align-items: center;
@@ -425,37 +661,41 @@
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
+            transition: all var(--transition-fast);
             cursor: pointer;
+        }
+        .job-card:hover {
+            border-color: var(--accent-blue);
+            box-shadow: var(--shadow-md);
+        }
+        .job-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        /* ========== 隐藏/显示 ========== */
+        .hidden {
+            display: none !important;
         }
         .page {
             display: none;
             flex-direction: column;
             gap: 20px;
+            flex: 1;
+            overflow-y: auto;
         }
         .page.active {
             display: flex;
         }
-        .config-panel {
-            position: fixed;
-            top: 70px;
-            right: 20px;
-            width: 320px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 16px;
-            z-index: 200;
-            box-shadow: var(--shadow-lg);
-        }
-        .config-panel label {
-            font-size: 11px;
-            color: var(--text-muted);
-            display: block;
-            margin-bottom: 4px;
-        }
-        .config-panel .input {
-            margin-bottom: 10px;
-        }
+
+        /* Toast */
         .toast {
             position: fixed;
             top: 20px;
@@ -467,6 +707,8 @@
             font-weight: 600;
             font-size: 13px;
             animation: slideIn 0.3s ease;
+            box-shadow: var(--shadow-lg);
+            max-width: 400px;
         }
         @keyframes slideIn {
             from {
@@ -481,23 +723,14 @@
         .toast-success {
             background: #059669;
         }
-        .toast-info {
-            background: var(--accent-blue);
-        }
         .toast-error {
             background: #dc2626;
         }
-        .editor-container {
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-            background: #0d1117;
-            min-height: 300px;
+        .toast-info {
+            background: var(--accent-blue);
         }
-        #monaco-editor {
-            height: 300px;
-            width: 100%;
-        }
+
+        /* 响应式 */
         .hamburger {
             display: none;
             background: none;
@@ -505,46 +738,63 @@
             color: #fff;
             font-size: 22px;
             cursor: pointer;
+            padding: 4px;
         }
         @media (max-width: 768px) {
-            .grid-2,
-            .grid-3,
-            .grid-4 {
-                grid-template-columns: 1fr;
-            }
-            .sidebar {
-                position: fixed;
-                left: -280px;
-            }
-            .sidebar.open {
-                left: 0;
-            }
             .hamburger {
                 display: block;
+            }
+            .topbar .mode-switch {
+                gap: 0;
+            }
+            .topbar .mode-btn {
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+            .content-area {
+                padding: 14px;
+                gap: 14px;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- 侧边栏 -->
+    <!-- ==================== 侧边栏 ==================== -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-logo">
             <div class="logo-icon"><i class="fa-solid fa-brain"></i></div>
-            <div class="logo-text">DevSmart<small>开发智慧平台 v1.0.2</small></div>
+            <div class="logo-text">DevSmart<small>开发智慧平台 v1.0.1</small></div>
         </div>
         <nav class="sidebar-nav" id="sidebarNav">
             <div class="nav-section">主菜单</div>
-            <a class="nav-item active" data-page="dashboard"><i class="fa-solid fa-gauge-high"></i> 仪表盘</a>
-            <a class="nav-item" data-page="learn"><i class="fa-solid fa-graduation-cap"></i> 学习中心<span class="nav-badge">API</span></a>
-            <a class="nav-item" data-page="work"><i class="fa-solid fa-briefcase"></i> 模拟上班</a>
+            <a class="nav-item active" data-page="dashboard">
+                <i class="fa-solid fa-gauge-high"></i> 仪表盘
+            </a>
+            <a class="nav-item" data-page="learn">
+                <i class="fa-solid fa-graduation-cap"></i> 学习中心
+                <span class="nav-badge">新</span>
+            </a>
+            <a class="nav-item" data-page="work">
+                <i class="fa-solid fa-briefcase"></i> 模拟上班
+            </a>
             <div class="nav-section">工具</div>
-            <a class="nav-item" data-page="exam"><i class="fa-solid fa-file-pen"></i> AI 考试中心</a>
-            <a class="nav-item" data-page="practice"><i class="fa-solid fa-code"></i> 在线实操</a>
-            <a class="nav-item" data-page="jobs"><i class="fa-solid fa-hand-holding-dollar"></i> 兼职广场</a>
+            <a class="nav-item" data-page="exam">
+                <i class="fa-solid fa-file-pen"></i> AI 考试中心
+            </a>
+            <a class="nav-item" data-page="practice">
+                <i class="fa-solid fa-code"></i> 在线实操
+            </a>
+            <a class="nav-item" data-page="jobs">
+                <i class="fa-solid fa-hand-holding-dollar"></i> 兼职广场
+            </a>
             <div class="nav-section">资源</div>
-            <a class="nav-item" data-page="courses"><i class="fa-solid fa-book-open"></i> 课程抓取</a>
-            <a class="nav-item" data-page="roadmaps"><i class="fa-solid fa-road"></i> 规划书</a>
+            <a class="nav-item" data-page="courses">
+                <i class="fa-solid fa-book-open"></i> 课程抓取
+            </a>
+            <a class="nav-item" data-page="roadmaps">
+                <i class="fa-solid fa-road"></i> 规划书
+            </a>
         </nav>
         <div class="sidebar-footer">
             <div class="avatar">U</div>
@@ -552,293 +802,319 @@
         </div>
     </aside>
 
-    <!-- 主区域 -->
+    <!-- ==================== 主区域 ==================== -->
     <div class="main-area">
+        <!-- 顶栏 -->
         <header class="topbar">
-            <button class="hamburger" id="hamburgerBtn"><i class="fa-solid fa-bars"></i></button>
+            <button class="hamburger" id="hamburgerBtn" title="菜单"><i class="fa-solid fa-bars"></i></button>
             <div class="mode-switch" id="modeSwitch">
                 <button class="mode-btn active" data-mode="learn-mode">🎓 学习模式</button>
                 <button class="mode-btn" data-mode="work-mode">💼 上班模式</button>
             </div>
             <div class="topbar-right">
                 <span style="font-size:12px;color:var(--text-muted);" id="currentModeLabel">当前：学习模式</span>
-                <button class="icon-btn" id="configToggle" title="API 配置"><i class="fa-solid fa-key"></i></button>
+                <button class="icon-btn" title="通知"><i class="fa-solid fa-bell"></i></button>
+                <button class="icon-btn" title="设置"><i class="fa-solid fa-gear"></i></button>
             </div>
         </header>
 
+        <!-- 内容区 - 多个页面 -->
         <div class="content-area" id="contentArea">
 
-            <!-- 仪表盘 -->
+            <!-- ========== 仪表盘页面 ========== -->
             <div class="page active" id="page-dashboard">
                 <h2 style="font-weight:700;font-size:22px;">👋 欢迎回来，开发者</h2>
-                <p style="color:var(--text-muted);margin-top:-12px;">DevSmart Platform v1.0.2 · 已接入真实 API</p>
+                <p style="color:var(--text-muted);margin-top:-12px;">DevSmart Platform · 一站式开发测试智慧平台</p>
                 <div class="grid-4">
                     <div class="card" style="text-align:center;">
                         <i class="fa-solid fa-book" style="font-size:28px;color:var(--accent-blue);margin-bottom:8px;display:block;"></i>
-                        <div style="font-size:24px;font-weight:800;" id="statCourses">--</div>
-                        <div style="font-size:12px;color:var(--text-muted);">可搜索课程</div>
+                        <div style="font-size:24px;font-weight:800;">48</div>
+                        <div style="font-size:12px;color:var(--text-muted);">已抓取课程</div>
                     </div>
                     <div class="card" style="text-align:center;">
-                        <i class="fa-solid fa-robot" style="font-size:28px;color:var(--accent-green);margin-bottom:8px;display:block;"></i>
-                        <div style="font-size:24px;font-weight:800;" id="statAI">✅</div>
-                        <div style="font-size:12px;color:var(--text-muted);">AI 已连接</div>
+                        <i class="fa-solid fa-file-pen" style="font-size:28px;color:var(--accent-green);margin-bottom:8px;display:block;"></i>
+                        <div style="font-size:24px;font-weight:800;">126</div>
+                        <div style="font-size:12px;color:var(--text-muted);">AI 出题数</div>
                     </div>
                     <div class="card" style="text-align:center;">
                         <i class="fa-solid fa-briefcase" style="font-size:28px;color:var(--accent-orange);margin-bottom:8px;display:block;"></i>
-                        <div style="font-size:24px;font-weight:800;" id="statJobs">--</div>
+                        <div style="font-size:24px;font-weight:800;">23</div>
                         <div style="font-size:12px;color:var(--text-muted);">兼职机会</div>
                     </div>
                     <div class="card" style="text-align:center;">
-                        <i class="fa-solid fa-cloud" style="font-size:28px;color:var(--accent-purple);margin-bottom:8px;display:block;"></i>
-                        <div style="font-size:24px;font-weight:800;" id="statCompiler">✅</div>
-                        <div style="font-size:12px;color:var(--text-muted);">云端编译器</div>
+                        <i class="fa-solid fa-code" style="font-size:28px;color:var(--accent-purple);margin-bottom:8px;display:block;"></i>
+                        <div style="font-size:24px;font-weight:800;">8</div>
+                        <div style="font-size:12px;color:var(--text-muted);">实操项目</div>
                     </div>
                 </div>
                 <div class="grid-2">
                     <div class="card">
-                        <div class="card-header"><span class="card-title">📊 学习进度</span></div>
-                        <div style="margin-bottom:8px;font-size:12px;"><span>React 高级课程</span><span style="float:right;">72%</span></div>
-                        <div class="progress-bar"><div class="fill-blue" style="width:72%;height:6px;border-radius:10px;"></div></div>
-                        <div style="margin-top:12px;font-size:12px;"><span>API 集成实战</span><span style="float:right;">45%</span></div>
-                        <div class="progress-bar"><div class="fill-blue" style="width:45%;height:6px;border-radius:10px;"></div></div>
+                        <div class="card-header"><span class="card-title">📊 学习进度</span><span class="tag tag-blue">本周</span></div>
+                        <div style="margin-bottom:8px;display:flex;justify-content:space-between;font-size:12px;"><span>React 高级课程</span><span>72%</span></div>
+                        <div class="progress-bar"><div class="fill fill-blue" style="width:72%;"></div></div>
+                        <div style="margin-top:12px;display:flex;justify-content:space-between;font-size:12px;"><span>自动化测试实战</span><span>45%</span></div>
+                        <div class="progress-bar"><div class="fill fill-green" style="width:45%;"></div></div>
+                        <div style="margin-top:12px;display:flex;justify-content:space-between;font-size:12px;"><span>Python 全栈</span><span>90%</span></div>
+                        <div class="progress-bar"><div class="fill fill-orange" style="width:90%;"></div></div>
                     </div>
                     <div class="card">
-                        <div class="card-header"><span class="card-title">🤖 AI 助手（已接入真实 API）</span></div>
+                        <div class="card-header"><span class="card-title">🤖 AI 助手</span><span class="tag tag-purple">GPT-4</span></div>
                         <div class="chat-area" id="dashChat" style="max-height:180px;">
-                            <div class="chat-msg ai">你好！我是 DevSmart AI 助手，已接入 GitHub Models 真实大模型。有什么问题可以问我！</div>
+                            <div class="chat-msg ai">你好！我是 DevSmart AI 助手。有什么学习或开发问题可以问我？</div>
                         </div>
                         <div class="chat-input-row" style="margin-top:8px;">
-                            <input type="text" class="input" id="dashChatInput" placeholder="输入问题...">
+                            <input type="text" class="input" id="dashChatInput" placeholder="输入问题..." style="flex:1;">
                             <button class="btn btn-primary btn-sm" onclick="sendDashChat()">发送</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 学习中心 -->
+            <!-- ========== 学习中心页面 ========== -->
             <div class="page" id="page-learn">
                 <h2 style="font-weight:700;font-size:22px;">🎓 学习中心</h2>
                 <div class="grid-2">
                     <div class="card">
-                        <div class="card-header"><span class="card-title">📺 视频学习区</span></div>
-                        <div id="videoList" style="max-height:350px;overflow-y:auto;">
-                            <p style="color:var(--text-muted);">点击下方按钮从 YouTube 搜索课程视频</p>
+                        <div class="card-header"><span class="card-title">📺 视频学习区</span><span class="tag tag-green">跟随输入模式</span></div>
+                        <div class="video-container" onclick="showToast('视频播放器启动中...','info')">
+                            <div class="video-overlay">
+                                <div class="play-btn"><i class="fa-solid fa-play"></i></div>
+                            </div>
+                            <div style="position:absolute;bottom:16px;left:16px;color:#fff;font-weight:600;font-size:14px;z-index:3;">React 18 新特性深度解析</div>
+                            <div style="position:absolute;bottom:16px;right:16px;color:#ccc;font-size:11px;z-index:3;">⏱ 32:15</div>
                         </div>
-                        <div style="margin-top:12px;display:flex;gap:10px;">
-                            <input type="text" class="input" id="videoSearchInput" placeholder="搜索关键词，如 React tutorial" style="flex:1;">
-                            <button class="btn btn-primary btn-sm" onclick="searchVideos()">🔍 搜索视频</button>
+                        <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+                            <span class="tag tag-blue">React</span><span class="tag tag-purple">前端</span><span class="tag tag-orange">中级</span>
                         </div>
+                        <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">来源：抓取自 Udemy · 评分 4.8</p>
                     </div>
                     <div class="card">
-                        <div class="card-header"><span class="card-title">💻 跟随输入练习</span></div>
+                        <div class="card-header"><span class="card-title">💻 跟随输入练习</span><span class="tag tag-cyan" style="background:rgba(6,182,212,0.15);color:#22d3ee;">在线编辑器</span></div>
                         <div class="editor-container">
-                            <div style="display:flex;gap:6px;padding:10px 16px;background:#161b22;border-bottom:1px solid var(--border-color);font-size:12px;color:var(--text-muted);">
-                                <span style="width:10px;height:10px;border-radius:50%;background:#ef4444;"></span>
-                                <span style="width:10px;height:10px;border-radius:50%;background:#f59e0b;"></span>
-                                <span style="width:10px;height:10px;border-radius:50%;background:#10b981;"></span>
+                            <div class="editor-header">
+                                <span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span>
                                 <span style="margin-left:8px;">main.js</span>
+                                <span class="tag tag-blue" style="margin-left:auto;">JavaScript</span>
                             </div>
                             <div id="monaco-editor"></div>
                         </div>
-                        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
-                            <button class="btn btn-primary btn-sm" onclick="runCodeCloud()">▶ 云端运行</button>
-                            <select class="input btn-sm" style="width:auto;" id="languageSelect">
+                        <div style="margin-top:10px;display:flex;gap:8px;">
+                            <button class="btn btn-primary btn-sm" onclick="runCode()">▶ 运行代码</button>
+                            <button class="btn btn-outline btn-sm" onclick="showToast('代码已保存','success')">💾 保存</button>
+                            <select class="input btn-sm" style="width:auto;padding:6px 28px 6px 10px;" id="languageSelect" onchange="changeLanguage()">
                                 <option value="javascript">JavaScript</option>
-                                <option value="python3">Python</option>
+                                <option value="typescript">TypeScript</option>
+                                <option value="python">Python</option>
                                 <option value="java">Java</option>
-                                <option value="cpp17">C++</option>
                                 <option value="go">Go</option>
+                                <option value="rust">Rust</option>
                             </select>
                         </div>
-                        <div id="codeOutput" style="margin-top:10px;padding:12px;background:#0d1117;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#34d399;max-height:150px;overflow-y:auto;display:none;"></div>
+                        <div id="codeOutput" style="margin-top:10px;padding:12px;background:#0d1117;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#34d399;max-height:120px;overflow-y:auto;display:none;"></div>
+                    </div>
+                </div>
+                <!-- AI出题快捷入口 -->
+                <div class="card" style="background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(59,130,246,0.08));border-color:rgba(139,92,246,0.3);">
+                    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+                        <i class="fa-solid fa-robot" style="font-size:40px;color:var(--accent-purple);"></i>
+                        <div style="flex:1;min-width:200px;">
+                            <strong>🤖 AI 大模型出题</strong>
+                            <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">根据当前学习课程自动生成考试题目，支持单选、多选、编程题</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="switchPage('exam')">立即生成考题 →</button>
                     </div>
                 </div>
             </div>
 
-            <!-- 模拟上班 -->
+            <!-- ========== 模拟上班页面 ========== -->
             <div class="page" id="page-work">
                 <h2 style="font-weight:700;font-size:22px;">💼 模拟上班模式</h2>
                 <div class="card">
-                    <div class="card-header"><span class="card-title">选择职业角色 & 学习内容</span></div>
-                    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
-                        <button class="btn btn-outline role-btn active" data-role="fullstack">全栈开发</button>
-                        <button class="btn btn-outline role-btn" data-role="qa">普通测试</button>
-                        <button class="btn btn-outline role-btn" data-role="sdet">测试开发</button>
-                    </div>
-                    <div style="display:flex;gap:10px;align-items:center;">
-                        <input type="text" class="input" id="learningTopicInput" placeholder="输入你正在学的内容，如 React、Playwright..." style="flex:1;">
-                        <button class="btn btn-primary btn-sm" onclick="generateTasksFromAPI()">🤖 AI 生成任务</button>
+                    <div class="card-header"><span class="card-title">选择你的职业角色</span></div>
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;" id="roleSelector">
+                        <button class="btn btn-outline btn-lg role-btn active" data-role="fullstack" style="flex:1;min-width:140px;justify-content:center;">
+                            <i class="fa-solid fa-layer-group"></i> 全栈开发
+                        </button>
+                        <button class="btn btn-outline btn-lg role-btn" data-role="qa" style="flex:1;min-width:140px;justify-content:center;">
+                            <i class="fa-solid fa-bug"></i> 普通测试
+                        </button>
+                        <button class="btn btn-outline btn-lg role-btn" data-role="sdet" style="flex:1;min-width:140px;justify-content:center;">
+                            <i class="fa-solid fa-shield-halved"></i> 测试开发
+                        </button>
                     </div>
                 </div>
-                <div class="card" id="workTaskCard">
-                    <div class="card-header"><span class="card-title">📋 今日任务</span><span class="tag tag-orange" id="roleTag">全栈开发</span></div>
-                    <div id="taskList"><p style="color:var(--text-muted);">输入学习内容后点击 "AI 生成任务"</p></div>
+                <div class="grid-2">
+                    <div class="card" id="workTaskCard">
+                        <div class="card-header"><span class="card-title">📋 今日任务</span><span class="tag tag-orange" id="roleTag">全栈开发</span></div>
+                        <div id="taskList">
+                            <div style="padding:10px;border-bottom:1px solid var(--border-color);font-size:13px;">🔨 完成用户认证模块开发</div>
+                            <div style="padding:10px;border-bottom:1px solid var(--border-color);font-size:13px;">📝 编写 RESTful API 文档</div>
+                            <div style="padding:10px;border-bottom:1px solid var(--border-color);font-size:13px;">🐛 修复 Dashboard 页面 Bug</div>
+                            <div style="padding:10px;font-size:13px;">✅ 代码审查 PR #142</div>
+                        </div>
+                        <button class="btn btn-green btn-sm" style="margin-top:12px;" onclick="showToast('任务已打卡！','success')">✅ 打卡完成</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">⏰ 模拟工作时钟</span></div>
+                        <div style="text-align:center;font-size:48px;font-weight:800;letter-spacing:-2px;" id="workClock">09:30:00</div>
+                        <div style="text-align:center;color:var(--text-muted);font-size:12px;">模拟工作时间 · 专注计时中</div>
+                        <div style="display:flex;gap:10px;margin-top:16px;justify-content:center;">
+                            <button class="btn btn-primary btn-sm" onclick="startWorkClock()">▶ 开始工作</button>
+                            <button class="btn btn-outline btn-sm" onclick="stopWorkClock()">⏸ 暂停</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- AI 考试中心 -->
+            <!-- ========== AI考试中心页面 ========== -->
             <div class="page" id="page-exam">
                 <h2 style="font-weight:700;font-size:22px;">📝 AI 考试中心</h2>
                 <div class="card">
-                    <div class="card-header"><span class="card-title">AI 动态出题（基于真实大模型）</span></div>
+                    <div class="card-header"><span class="card-title">生成考试</span></div>
                     <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:end;">
                         <div style="flex:1;min-width:180px;">
-                            <label style="font-size:11px;color:var(--text-muted);">考试主题</label>
-                            <input type="text" class="input" id="examTopicInput" value="React 18 并发特性">
+                            <label style="font-size:11px;color:var(--text-muted);">选择课程来源</label>
+                            <select class="input" id="examCourseSelect">
+                                <option>React 18 新特性深度解析</option>
+                                <option>自动化测试实战 (Playwright)</option>
+                                <option>Python 全栈开发</option>
+                                <option>Java Spring Boot 微服务</option>
+                                <option>Go 语言高并发编程</option>
+                            </select>
                         </div>
-                        <button class="btn btn-primary" onclick="generateRealExam()">🤖 真实 AI 生成考题</button>
+                        <div style="flex:1;min-width:120px;">
+                            <label style="font-size:11px;color:var(--text-muted);">题目数量</label>
+                            <select class="input" id="examCount">
+                                <option>5 题</option><option>10 题</option><option>15 题</option><option>20 题</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="generateExam()" style="height:42px;">🤖 AI 生成考题</button>
                     </div>
                 </div>
                 <div id="examArea">
                     <div class="card" style="text-align:center;padding:40px;">
                         <i class="fa-solid fa-robot" style="font-size:48px;color:var(--text-muted);"></i>
-                        <p style="color:var(--text-muted);margin-top:12px;">输入主题后点击按钮，AI 将真实生成考试题目</p>
+                        <p style="color:var(--text-muted);margin-top:12px;">点击上方按钮，AI 将根据课程内容自动生成考试题目</p>
                     </div>
                 </div>
             </div>
 
-            <!-- 在线实操 -->
+            <!-- ========== 在线实操页面 ========== -->
             <div class="page" id="page-practice">
-                <h2 style="font-weight:700;font-size:22px;">🛠 在线实操 · 云端编译运行</h2>
-                <div class="card">
-                    <div class="card-header"><span class="card-title">云端实操环境</span><span class="tag tag-green">JDoodle API</span></div>
-                    <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">在下方编辑器中编写代码，选择语言后点击"云端运行"，代码将在 JDoodle 的真实编译环境中执行。</p>
-                    <div class="editor-container" style="border:1px solid var(--border-color);">
-                        <div style="display:flex;gap:6px;padding:10px 16px;background:#161b22;border-bottom:1px solid var(--border-color);font-size:12px;color:var(--text-muted);">
-                            <span style="width:10px;height:10px;border-radius:50%;background:#ef4444;"></span>
-                            <span style="width:10px;height:10px;border-radius:50%;background:#f59e0b;"></span>
-                            <span style="width:10px;height:10px;border-radius:50%;background:#10b981;"></span>
-                            <span style="margin-left:8px;">practice.js</span>
-                        </div>
-                        <textarea id="practiceCodeArea" class="input" style="min-height:200px;font-family:'JetBrains Mono',monospace;border-radius:0;border:none;background:#0d1117;color:#e2e8f0;padding:16px;">console.log("Hello, DevSmart Platform v1.0.2!");
-            // 在这里编写你的代码，点击下方按钮在云端真实运行
-            for (let i = 1; i <= 5; i++) {
-              console.log("云端编译运行测试 #" + i);
-            }</textarea>
+                <h2 style="font-weight:700;font-size:22px;">🛠 在线实操 · 抓取项目</h2>
+                <div class="grid-3">
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">📦 电商后台系统</span><span class="tag tag-green">全栈</span></div>
+                        <p style="font-size:12px;color:var(--text-muted);">React + Node.js + MongoDB 完整电商后台</p>
+                        <div style="margin-top:8px;font-size:11px;">⭐ 4.9 · 抓取自 GitHub</div>
+                        <button class="btn btn-outline btn-sm" style="margin-top:10px;" onclick="showToast('项目已克隆到实操环境','success')">🚀 开始实操</button>
                     </div>
-                    <div style="margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                        <select class="input btn-sm" style="width:auto;" id="practiceLangSelect">
-                            <option value="javascript">JavaScript</option>
-                            <option value="python3">Python</option>
-                            <option value="java">Java</option>
-                            <option value="cpp17">C++</option>
-                            <option value="go">Go</option>
-                            <option value="rust">Rust</option>
-                            <option value="csharp">C#</option>
-                            <option value="php">PHP</option>
-                        </select>
-                        <button class="btn btn-primary" onclick="runPracticeCode()">🚀 云端运行</button>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">🧪 自动化测试框架</span><span class="tag tag-purple">测试</span></div>
+                        <p style="font-size:12px;color:var(--text-muted);">Playwright + Pytest 企业级测试框架</p>
+                        <div style="margin-top:8px;font-size:11px;">⭐ 4.7 · 抓取自 GitLab</div>
+                        <button class="btn btn-outline btn-sm" style="margin-top:10px;" onclick="showToast('项目已克隆到实操环境','success')">🚀 开始实操</button>
                     </div>
-                    <div id="practiceOutput" style="margin-top:12px;padding:14px;background:#0d1117;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#34d399;max-height:250px;overflow-y:auto;display:none;"></div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">🔧 DevOps 工具链</span><span class="tag tag-orange">运维</span></div>
+                        <p style="font-size:12px;color:var(--text-muted);">Docker + K8s + CI/CD 完整流水线</p>
+                        <div style="margin-top:8px;font-size:11px;">⭐ 4.8 · 抓取自 GitHub</div>
+                        <button class="btn btn-outline btn-sm" style="margin-top:10px;" onclick="showToast('项目已克隆到实操环境','success')">🚀 开始实操</button>
+                    </div>
                 </div>
             </div>
 
-            <!-- 兼职广场 -->
+            <!-- ========== 兼职广场页面 ========== -->
             <div class="page" id="page-jobs">
-                <h2 style="font-weight:700;font-size:22px;">💼 兼职广场 · 真实远程开发岗位</h2>
-                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
-                    <select class="input" style="width:auto;flex:1;min-width:150px;" id="jobCategorySelect">
-                        <option value="programming">开发 / 编程</option>
-                        <option value="devops">DevOps</option>
-                        <option value="data-science">数据科学</option>
-                        <option value="design">设计</option>
+                <h2 style="font-weight:700;font-size:22px;">💼 兼职广场 · 专属开发兼职</h2>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
+                    <select class="input" style="width:auto;flex:1;min-width:150px;">
+                        <option>全部类型</option><option>全栈开发</option><option>前端开发</option><option>测试工程师</option><option>DevOps</option>
                     </select>
-                    <button class="btn btn-primary btn-sm" onclick="fetchRealJobs()">🔍 获取最新岗位</button>
+                    <button class="btn btn-primary btn-sm">🔍 筛选</button>
                 </div>
-                <div id="jobList"><p style="color:var(--text-muted);">点击按钮从 RemoteJobs API 获取真实开发岗位</p></div>
-                <p style="font-size:10px;color:var(--text-muted);text-align:center;">数据来源：RemoteJobs.org API（免费 · 无需信用卡）</p>
+                <div style="display:flex;flex-direction:column;gap:10px;" id="jobList">
+                    <div class="job-card">
+                        <div class="job-avatar" style="background:rgba(59,130,246,0.2);color:#60a5fa;">R</div>
+                        <div style="flex:1;"><strong>React 前端兼职开发</strong><p style="font-size:11px;color:var(--text-muted);">远程 · $40-60/hr · 发布于2小时前</p></div>
+                        <span class="tag tag-green">急聘</span>
+                        <button class="btn btn-primary btn-sm">申请</button>
+                    </div>
+                    <div class="job-card">
+                        <div class="job-avatar" style="background:rgba(16,185,129,0.2);color:#34d399;">T</div>
+                        <div style="flex:1;"><strong>自动化测试脚本编写</strong><p style="font-size:11px;color:var(--text-muted);">兼职 · ¥300-500/天 · 发布于5小时前</p></div>
+                        <span class="tag tag-blue">测试开发</span>
+                        <button class="btn btn-primary btn-sm">申请</button>
+                    </div>
+                    <div class="job-card">
+                        <div class="job-avatar" style="background:rgba(245,158,11,0.2);color:#fbbf24;">F</div>
+                        <div style="flex:1;"><strong>全栈开发者 (Freelance)</strong><p style="font-size:11px;color:var(--text-muted);">远程 · $50-80/hr · 发布于1天前</p></div>
+                        <span class="tag tag-orange">全栈</span>
+                        <button class="btn btn-primary btn-sm">申请</button>
+                    </div>
+                    <div class="job-card">
+                        <div class="job-avatar" style="background:rgba(139,92,246,0.2);color:#a78bfa;">D</div>
+                        <div style="flex:1;"><strong>DevOps 兼职顾问</strong><p style="font-size:11px;color:var(--text-muted);">混合 · ¥800/天 · 发布于2天前</p></div>
+                        <span class="tag tag-purple">DevOps</span>
+                        <button class="btn btn-primary btn-sm">申请</button>
+                    </div>
+                </div>
+                <p style="font-size:11px;color:var(--text-muted);text-align:center;">数据来源：Upwork / 猪八戒 / 程序员客栈 · 实时抓取</p>
             </div>
 
-            <!-- 课程抓取 -->
+            <!-- ========== 课程抓取页面 ========== -->
             <div class="page" id="page-courses">
                 <h2 style="font-weight:700;font-size:22px;">📚 课程抓取</h2>
                 <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                    <input type="text" class="input" id="courseSearchInput" placeholder="搜索编程课程..." style="flex:1;min-width:200px;">
-                    <button class="btn btn-primary" onclick="searchCourseVideos()">🔍 抓取课程</button>
+                    <input type="text" class="input" placeholder="搜索课程关键词..." style="flex:1;min-width:200px;">
+                    <button class="btn btn-primary">🔍 抓取课程</button>
                 </div>
-                <div class="grid-3" id="courseResults" style="margin-top:8px;">
-                    <p style="color:var(--text-muted);">输入关键词后点击按钮搜索 YouTube 编程课程</p>
+                <div class="grid-3" style="margin-top:8px;">
+                    <div class="card"><strong>React 18 新特性</strong><p style="font-size:11px;color:var(--text-muted);">Udemy · 4.8⭐ · 32课时</p><span class="tag tag-blue">前端</span></div>
+                    <div class="card"><strong>Playwright 自动化测试</strong><p style="font-size:11px;color:var(--text-muted);">Coursera · 4.7⭐ · 28课时</p><span class="tag tag-purple">测试</span></div>
+                    <div class="card"><strong>Spring Boot 微服务</strong><p style="font-size:11px;color:var(--text-muted);">B站 · 4.9⭐ · 45课时</p><span class="tag tag-green">后端</span></div>
                 </div>
             </div>
 
-            <!-- 规划书 -->
+            <!-- ========== 规划书页面 ========== -->
             <div class="page" id="page-roadmaps">
                 <h2 style="font-weight:700;font-size:22px;">🗺 学习规划书</h2>
                 <div class="grid-2">
                     <div class="card">
                         <div class="card-header"><span class="card-title">全栈开发学习路线</span><span class="tag tag-blue">热门</span></div>
-                        <div style="font-size:12px;line-height:2;">📍 HTML/CSS → JavaScript → React → Node.js → 数据库 → DevOps</div>
-                        <div class="progress-bar" style="margin-top:8px;"><div class="fill-blue" style="width:65%;height:6px;border-radius:10px;"></div></div>
+                        <div style="font-size:12px;line-height:2;">
+                            📍 HTML/CSS → JavaScript → React → Node.js → 数据库 → DevOps
+                        </div>
+                        <div class="progress-bar" style="margin-top:8px;"><div class="fill fill-blue" style="width:65%;"></div></div>
                     </div>
                     <div class="card">
                         <div class="card-header"><span class="card-title">测试开发进阶路线</span><span class="tag tag-purple">推荐</span></div>
-                        <div style="font-size:12px;line-height:2;">📍 测试基础 → 自动化框架 → CI/CD → 性能测试 → 安全测试</div>
-                        <div class="progress-bar" style="margin-top:8px;"><div class="fill-blue" style="width:40%;height:6px;border-radius:10px;"></div></div>
+                        <div style="font-size:12px;line-height:2;">
+                            📍 测试基础 → 自动化框架 → CI/CD → 性能测试 → 安全测试
+                        </div>
+                        <div class="progress-bar" style="margin-top:8px;"><div class="fill fill-green" style="width:40%;"></div></div>
                     </div>
                 </div>
             </div>
 
-        </div>
-    </div>
+        </div><!-- /content-area -->
+    </div><!-- /main-area -->
 
-    <!-- API 配置面板 -->
-    <div class="config-panel hidden" id="configPanel">
-        <strong style="font-size:14px;">🔑 API 密钥配置</strong>
-        <p style="font-size:10px;color:var(--text-muted);margin:4px 0 12px;">所有 API 均免费，密钥仅保存在你本地浏览器中</p>
-        <label>GitHub Personal Access Token</label>
-        <input type="password" class="input" id="cfgGithubToken" placeholder="ghp_xxxxxxxxxxxx">
-        <label>YouTube Data API Key</label>
-        <input type="password" class="input" id="cfgYoutubeKey" placeholder="AIzaSyBxxxxxxxxxxxx">
-        <label>JDoodle Client ID</label>
-        <input type="text" class="input" id="cfgJdoodleId" placeholder="your-jdoodle-client-id">
-        <label>JDoodle Client Secret</label>
-        <input type="password" class="input" id="cfgJdoodleSecret" placeholder="your-jdoodle-client-secret">
-        <button class="btn btn-primary btn-sm" onclick="saveConfig()" style="width:100%;">💾 保存配置</button>
-        <p style="font-size:9px;color:var(--text-muted);margin-top:8px;">
-            <a href="https://github.com/settings/tokens" target="_blank" style="color:var(--accent-cyan);">获取 GitHub Token</a> ·
-            <a href="https://console.cloud.google.com/apis" target="_blank" style="color:var(--accent-cyan);">获取 YouTube Key</a> ·
-            <a href="https://www.jdoodle.com/compiler-api/" target="_blank" style="color:var(--accent-cyan);">获取 JDoodle Key</a>
-        </p>
-    </div>
-
+    <!-- Toast容器 -->
     <div id="toastContainer"></div>
 
-    <!-- Monaco Editor -->
+    <!-- Monaco Editor 加载器 -->
     <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
     <script>
-        // ==================== API 配置管理 ====================
-        const API_CONFIG = {
-            githubToken: '',
-            youtubeKey: '',
-            jdoodleId: '',
-            jdoodleSecret: '',
+        // ==================== 全局状态 ====================
+        const APP_STATE = {
+            currentMode: 'learn-mode', // 'learn-mode' | 'work-mode'
+            currentPage: 'dashboard',
+            workRole: 'fullstack', // 'fullstack' | 'qa' | 'sdet'
+            workClockInterval: null,
+            workClockRunning: false,
+            workClockSeconds: 0,
         };
-
-        function loadConfig() {
-            try {
-                const saved = localStorage.getItem('devsmart_api_config');
-                if (saved) Object.assign(API_CONFIG, JSON.parse(saved));
-            } catch (e) {}
-            document.getElementById('cfgGithubToken').value = API_CONFIG.githubToken;
-            document.getElementById('cfgYoutubeKey').value = API_CONFIG.youtubeKey;
-            document.getElementById('cfgJdoodleId').value = API_CONFIG.jdoodleId;
-            document.getElementById('cfgJdoodleSecret').value = API_CONFIG.jdoodleSecret;
-        }
-
-        function saveConfig() {
-            API_CONFIG.githubToken = document.getElementById('cfgGithubToken').value.trim();
-            API_CONFIG.youtubeKey = document.getElementById('cfgYoutubeKey').value.trim();
-            API_CONFIG.jdoodleId = document.getElementById('cfgJdoodleId').value.trim();
-            API_CONFIG.jdoodleSecret = document.getElementById('cfgJdoodleSecret').value.trim();
-            localStorage.setItem('devsmart_api_config', JSON.stringify(API_CONFIG));
-            document.getElementById('configPanel').classList.add('hidden');
-            showToast('API 配置已保存 ✅', 'success');
-            updateDashboardStats();
-        }
-
-        document.getElementById('configToggle').addEventListener('click', () => {
-            document.getElementById('configPanel').classList.toggle('hidden');
-        });
 
         // ==================== Toast ====================
         function showToast(message, type = 'info') {
@@ -849,369 +1125,379 @@
             container.appendChild(toast);
             setTimeout(() => {
                 toast.style.opacity = '0';
-                toast.style.transition = 'all 0.3s';
+                toast.style.transform = 'translateX(100px)';
+                toast.style.transition = 'all 0.3s ease';
                 setTimeout(() => toast.remove(), 300);
-            }, 3000);
+            }, 2500);
         }
 
         // ==================== 页面切换 ====================
-        const APP_STATE = { currentPage: 'dashboard', workRole: 'fullstack' };
-
-        function switchPage(name) {
-            APP_STATE.currentPage = name;
-            document.querySelectorAll('#sidebarNav .nav-item').forEach(i => i.classList.remove('active'));
-            const nav = document.querySelector(`#sidebarNav .nav-item[data-page="${name}"]`);
-            if (nav) nav.classList.add('active');
+        function switchPage(pageName) {
+            APP_STATE.currentPage = pageName;
+            // 更新侧边栏
+            document.querySelectorAll('#sidebarNav .nav-item').forEach(item => item.classList.remove('active'));
+            const navItem = document.querySelector(`#sidebarNav .nav-item[data-page="${pageName}"]`);
+            if (navItem) navItem.classList.add('active');
+            // 更新页面
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            const pageEl = document.getElementById(`page-${name}`);
+            const pageEl = document.getElementById(`page-${pageName}`);
             if (pageEl) pageEl.classList.add('active');
+            // 滚动到顶部
             document.getElementById('contentArea').scrollTop = 0;
-            if (name === 'learn' && window.monacoEditor) setTimeout(() => window.monacoEditor.layout(), 200);
+            // 如果切换到学习页面，刷新编辑器布局
+            if (pageName === 'learn' && window.monacoEditor) {
+                setTimeout(() => window.monacoEditor.layout(), 200);
+            }
         }
 
+        // 侧边栏点击事件
         document.getElementById('sidebarNav').addEventListener('click', function(e) {
-            const item = e.target.closest('.nav-item');
-            if (!item) return;
+            const navItem = e.target.closest('.nav-item');
+            if (!navItem) return;
             e.preventDefault();
-            const page = item.getAttribute('data-page');
-            if (page) switchPage(page);
+            const pageName = navItem.getAttribute('data-page');
+            if (pageName) switchPage(pageName);
+            // 移动端关闭侧边栏
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('open');
+            }
         });
 
-        document.getElementById('hamburgerBtn').addEventListener('click', () => {
+        // 汉堡菜单
+        document.getElementById('hamburgerBtn').addEventListener('click', function() {
             document.getElementById('sidebar').classList.toggle('open');
         });
 
-        // 模式切换
+        // ==================== 模式切换 ====================
         document.getElementById('modeSwitch').addEventListener('click', function(e) {
             const btn = e.target.closest('.mode-btn');
             if (!btn) return;
+            const mode = btn.getAttribute('data-mode');
+            APP_STATE.currentMode = mode;
             document.querySelectorAll('#modeSwitch .mode-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            const mode = btn.getAttribute('data-mode');
-            document.getElementById('currentModeLabel').textContent = mode === 'work-mode' ? '当前：上班模式' : '当前：学习模式';
-            switchPage(mode === 'work-mode' ? 'work' : 'learn');
+            const label = document.getElementById('currentModeLabel');
+            if (mode === 'work-mode') {
+                label.textContent = '当前：上班模式';
+                switchPage('work');
+            } else {
+                label.textContent = '当前：学习模式';
+                switchPage('learn');
+            }
+            showToast(mode === 'work-mode' ? '已切换到 💼 模拟上班模式' : '已切换到 🎓 学习模式', 'info');
         });
 
-        // 角色切换
-        document.addEventListener('click', function(e) {
+        // ==================== 职业角色切换 ====================
+        document.getElementById('roleSelector')?.addEventListener('click', function(e) {
             const btn = e.target.closest('.role-btn');
             if (!btn) return;
             document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             APP_STATE.workRole = btn.getAttribute('data-role');
-            document.getElementById('roleTag').textContent = {
-                fullstack: '全栈开发',
-                qa: '普通测试',
-                sdet: '测试开发'
-            } [APP_STATE.workRole] || '全栈开发';
+            const roleTag = document.getElementById('roleTag');
+            const taskList = document.getElementById('taskList');
+            const roleNames = { fullstack: '全栈开发', qa: '普通测试', sdet: '测试开发' };
+            const tasks = {
+                fullstack: [
+                    '🔨 完成用户认证模块开发',
+                    '📝 编写 RESTful API 文档',
+                    '🐛 修复 Dashboard 页面 Bug',
+                    '✅ 代码审查 PR #142',
+                ],
+                qa: [
+                    '🧪 编写测试用例 (Login模块)',
+                    '🐞 执行回归测试套件',
+                    '📋 提交 Bug 报告 #237',
+                    '✅ 验证修复 Bug #198',
+                ],
+                sdet: [
+                    '🤖 搭建自动化测试框架',
+                    '📊 编写性能测试脚本',
+                    '🔧 优化 CI/CD 测试流水线',
+                    '✅ 代码覆盖率报告分析',
+                ],
+            };
+            if (roleTag) roleTag.textContent = roleNames[APP_STATE.workRole] || '全栈开发';
+            if (taskList && tasks[APP_STATE.workRole]) {
+                taskList.innerHTML = tasks[APP_STATE.workRole]
+                    .map(t => `<div style="padding:10px;border-bottom:1px solid var(--border-color);font-size:13px;">${t}</div>`)
+                    .join('');
+            }
+            showToast(`角色已切换：${roleNames[APP_STATE.workRole]}`, 'info');
         });
 
-        // ==================== AI 调用核心（GitHub Models API） ====================
-        async function callAI(messages) {
-            const token = API_CONFIG.githubToken;
-            if (!token) {
-                showToast('请先在右侧配置面板填入 GitHub Token', 'error');
-                return null;
+        // ==================== 工作时钟 ====================
+        function updateWorkClockDisplay() {
+            const sec = APP_STATE.workClockSeconds;
+            const h = Math.floor(sec / 3600);
+            const m = Math.floor((sec % 3600) / 60);
+            const s = sec % 60;
+            const display = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            const clockEl = document.getElementById('workClock');
+            if (clockEl) clockEl.textContent = display;
+        }
+
+        function startWorkClock() {
+            if (APP_STATE.workClockRunning) return;
+            APP_STATE.workClockRunning = true;
+            if (APP_STATE.workClockSeconds === 0) {
+                // 默认从9:30开始
+                APP_STATE.workClockSeconds = 9 * 3600 + 30 * 60;
             }
-            try {
-                const res = await fetch('https://models.github.ai/inference/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({
-                        model: 'gpt-4o',
-                        messages: messages,
-                        max_tokens: 800,
-                    }),
-                });
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const data = await res.json();
-                return data.choices?.[0]?.message?.content || null;
-            } catch (err) {
-                console.error('AI 调用失败:', err);
-                showToast('AI 调用失败，请检查 Token 是否正确', 'error');
-                return null;
+            updateWorkClockDisplay();
+            APP_STATE.workClockInterval = setInterval(() => {
+                APP_STATE.workClockSeconds++;
+                updateWorkClockDisplay();
+            }, 1000);
+            showToast('工作时钟已启动 ⏰', 'success');
+        }
+
+        function stopWorkClock() {
+            APP_STATE.workClockRunning = false;
+            if (APP_STATE.workClockInterval) {
+                clearInterval(APP_STATE.workClockInterval);
+                APP_STATE.workClockInterval = null;
             }
+            showToast('工作时钟已暂停', 'info');
         }
 
-        // ==================== 仪表盘 AI 对话 ====================
-        async function sendDashChat() {
-            const input = document.getElementById('dashChatInput');
-            const chat = document.getElementById('dashChat');
-            const msg = input.value.trim();
-            if (!msg) return;
-            chat.innerHTML += `<div class="chat-msg user">${escapeHtml(msg)}</div>`;
-            input.value = '';
-            chat.scrollTop = chat.scrollHeight;
-            const reply = await callAI([{ role: 'user', content: msg }]);
-            chat.innerHTML +=
-                `<div class="chat-msg ai">${escapeHtml(reply || '抱歉，AI 暂时无法回复，请检查 API 配置。')}</div>`;
-            chat.scrollTop = chat.scrollHeight;
-        }
-        document.getElementById('dashChatInput')?.addEventListener('keydown', e => { if (e.key === 'Enter')
-                sendDashChat(); });
-
-        function escapeHtml(s) { const d = document.createElement('div');
-            d.textContent = s; return d.innerHTML; }
-
-        // ==================== YouTube 视频搜索 ====================
-        async function searchVideos() {
-            const query = document.getElementById('videoSearchInput')?.value?.trim() || 'React tutorial';
-            const key = API_CONFIG.youtubeKey;
-            if (!key) { showToast('请先配置 YouTube API Key', 'error'); return; }
-            try {
-                const res = await fetch(
-                    `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=6&q=${encodeURIComponent(query)}+programming+tutorial&type=video&key=${key}`
-                    );
-                const data = await res.json();
-                const list = document.getElementById('videoList');
-                if (!data.items?.length) { list.innerHTML = '<p style="color:var(--text-muted);">未找到相关视频</p>'; return; }
-                list.innerHTML = data.items.map(v => `
-                <div style="display:flex;gap:10px;padding:10px;border-bottom:1px solid var(--border-color);cursor:pointer;" onclick="window.open('https://www.youtube.com/watch?v=${v.id.videoId}')">
-                  <img src="${v.snippet.thumbnails.default.url}" style="width:100px;height:56px;object-fit:cover;border-radius:4px;">
-                  <div>
-                    <strong style="font-size:12px;">${escapeHtml(v.snippet.title)}</strong>
-                    <p style="font-size:10px;color:var(--text-muted);">${escapeHtml(v.snippet.channelTitle)}</p>
-                  </div>
-                </div>`).join('');
-                document.getElementById('statCourses').textContent = data.pageInfo?.totalResults || '--';
-            } catch (e) { showToast('视频搜索失败', 'error'); }
-        }
-
-        async function searchCourseVideos() {
-            const query = document.getElementById('courseSearchInput')?.value?.trim() || 'Python';
-            const key = API_CONFIG.youtubeKey;
-            if (!key) { showToast('请先配置 YouTube API Key', 'error'); return; }
-            try {
-                const res = await fetch(
-                    `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=6&q=${encodeURIComponent(query)}+full+course&type=video&key=${key}`
-                    );
-                const data = await res.json();
-                const container = document.getElementById('courseResults');
-                if (!data.items?.length) { container.innerHTML =
-                    '<p style="color:var(--text-muted);">未找到课程</p>'; return; }
-                container.innerHTML = data.items.map(v => `
-                <div class="card">
-                  <strong>${escapeHtml(v.snippet.title)}</strong>
-                  <p style="font-size:11px;color:var(--text-muted);">${escapeHtml(v.snippet.channelTitle)} · YouTube</p>
-                  <span class="tag tag-blue">编程课程</span>
-                </div>`).join('');
-            } catch (e) { showToast('课程搜索失败', 'error'); }
-        }
-
-        // ==================== AI 真实出题 ====================
-        async function generateRealExam() {
-            const topic = document.getElementById('examTopicInput')?.value?.trim() || 'React 18';
+        // ==================== AI 生成考试 ====================
+        function generateExam() {
+            const course = document.getElementById('examCourseSelect')?.value || 'React 18 新特性';
+            const countText = document.getElementById('examCount')?.value || '5 题';
+            const count = parseInt(countText);
             const examArea = document.getElementById('examArea');
-            examArea.innerHTML =
-                '<div class="card" style="text-align:center;padding:30px;"><i class="fa-solid fa-spinner fa-spin" style="font-size:32px;color:var(--accent-blue);"></i><p style="margin-top:12px;">AI 正在生成考题...</p></div>';
+            if (!examArea) return;
 
-            const prompt = `你是一位专业的编程考试出题老师。请根据主题"${topic}"，生成5道单项选择题，难度中等偏上。
-            请严格按照以下JSON格式输出（不要输出其他内容）：
-            [{"question":"题目","options":["A选项","B选项","C选项","D选项"],"answer":0}]
-            其中answer是正确答案的索引（0-3）。`;
+            // 模拟AI生成的考题
+            const mockQuestions = [
+                { q: 'React 18 中引入的并发特性叫什么？', options: ['Concurrent Mode', 'Parallel Mode', 'Async Mode',
+                        'Streaming Mode'
+                    ], answer: 0 },
+                { q: '以下哪个 Hook 用于处理副作用？', options: ['useState', 'useEffect', 'useContext', 'useReducer'],
+                    answer: 1 },
+                { q: 'TypeScript 中 interface 和 type 的主要区别是？', options: ['没有区别', 'interface 可被扩展',
+                        'type 更强大', 'interface 更快'
+                    ], answer: 1 },
+                { q: 'Playwright 支持哪些浏览器？', options: ['仅Chrome', 'Chrome+Firefox',
+                        'Chrome+Firefox+WebKit', '所有浏览器'], answer: 2 },
+                { q: 'Docker 的核心概念不包括？', options: ['Image', 'Container', 'Virtual Machine', 'Dockerfile'],
+                    answer: 2 },
+                { q: 'RESTful API 中 GET 请求应该用于？', options: ['创建资源', '获取资源', '更新资源', '删除资源'], answer: 1 },
+                { q: 'Git 中合并分支的命令是？', options: ['git push', 'git merge', 'git pull', 'git commit'],
+                answer: 1 },
+                { q: '以下哪个是 NoSQL 数据库？', options: ['MySQL', 'PostgreSQL', 'MongoDB', 'SQLite'], answer: 2 },
+                { q: 'CI/CD 中 CI 代表什么？', options: ['Continuous Integration', 'Code Integration',
+                        'Central Integration', 'Cloud Integration'
+                    ], answer: 0 },
+                { q: 'Python 中列表推导式的符号是？', options: ['()', '[]', '{}', '<>'], answer: 1 },
+            ];
 
-            const result = await callAI([{ role: 'user', content: prompt }]);
-            if (!result) {
-                examArea.innerHTML =
-                    '<div class="card" style="text-align:center;padding:40px;"><p style="color:var(--text-muted);">AI 出题失败，请检查 API 配置</p></div>';
-                return;
-            }
-            try {
-                const jsonStr = result.replace(/```json|```/g, '').trim();
-                const questions = JSON.parse(jsonStr);
-                let html =
-                    '<div class="card"><div class="card-header"><span class="card-title">📝 AI 生成考题</span><span class="tag tag-orange">真实 AI · ' +
-                    questions.length + '题</span></div>';
-                window.examQuestions = questions;
-                questions.forEach((q, i) => {
-                    html += `<div class="exam-card"><strong>第${i+1}题：${escapeHtml(q.question)}</strong><div style="margin-top:8px;">`;
-                    q.options.forEach((opt, oi) => {
-                        html +=
-                            `<label class="exam-option" onclick="selectExamOpt(this,${i},${oi})">${String.fromCharCode(65+oi)}. ${escapeHtml(opt)}</label>`;
-                    });
-                    html +=
-                        `</div><div id="exam-result-${i}" style="margin-top:6px;font-size:12px;font-weight:600;display:none;"></div></div>`;
-                });
-                html += '<button class="btn btn-primary" style="margin-top:12px;" onclick="submitRealExam()">📩 提交答卷</button></div>';
-                examArea.innerHTML = html;
-            } catch (e) {
-                examArea.innerHTML =
-                    '<div class="card" style="text-align:center;padding:40px;"><p style="color:var(--text-muted);">AI 返回格式不正确，请重试</p><pre style="font-size:10px;color:var(--text-muted);">' +
-                    escapeHtml(result) + '</pre></div>';
-            }
+            const selectedQuestions = mockQuestions.slice(0, Math.min(count, mockQuestions.length));
+            let examHTML = '<div class="card"><div class="card-header"><span class="card-title">📝 ' + course +
+                ' - 考试</span><span class="tag tag-orange">AI生成 · ' + selectedQuestions.length +
+                '题</span></div>';
+
+            selectedQuestions.forEach((q, i) => {
+                examHTML += `
+                <div class="exam-card" id="exam-q-${i}">
+                    <strong>第${i+1}题：${q.q}</strong>
+                    <div style="margin-top:8px;">
+                        ${q.options.map((opt, oi) => `
+                            <label class="exam-option" data-q="${i}" data-o="${oi}" onclick="selectExamOption(this, ${i}, ${oi}, ${q.answer})">
+                                ${String.fromCharCode(65+oi)}. ${opt}
+                            </label>
+                        `).join('')}
+                    </div>
+                    <div id="exam-result-${i}" style="margin-top:6px;font-size:12px;font-weight:600;display:none;"></div>
+                </div>`;
+            });
+
+            examHTML +=
+                '<button class="btn btn-primary" style="margin-top:12px;" onclick="submitExam()">📩 提交答卷</button></div>';
+            examArea.innerHTML = examHTML;
+            showToast(`AI 已生成 ${selectedQuestions.length} 道考题`, 'success');
         }
 
-        function selectExamOpt(el, qi, oi) {
-            const siblings = document.querySelectorAll(`.exam-option[onclick*="selectExamOpt(this,${qi}"]`);
-            siblings.forEach(s => s.classList.remove('selected'));
-            el.classList.add('selected');
-            el.closest('.exam-card').setAttribute('data-selected', oi);
+        function selectExamOption(labelEl, qIndex, oIndex, correctAnswer) {
+            const allOptions = document.querySelectorAll(`.exam-option[data-q="${qIndex}"]`);
+            allOptions.forEach(o => o.classList.remove('selected'));
+            labelEl.classList.add('selected');
+            // 存储选择
+            labelEl.parentElement.setAttribute('data-selected', oIndex);
+            labelEl.parentElement.setAttribute('data-correct', correctAnswer);
         }
 
-        function submitRealExam() {
-            let score = 0,
-                total = 0;
+        function submitExam() {
+            let score = 0;
+            let total = 0;
             document.querySelectorAll('.exam-card').forEach((card, i) => {
-                const selected = parseInt(card.getAttribute('data-selected') || '-1');
-                const correct = window.examQuestions?.[i]?.answer ?? 0;
+                const selected = card.querySelector('.exam-option.selected');
+                const correctAnswer = parseInt(card.getAttribute('data-correct') || '0');
                 const resultDiv = document.getElementById(`exam-result-${i}`);
                 total++;
-                if (selected === correct) {
-                    score++;
-                    if (resultDiv) { resultDiv.textContent = '✅ 正确!';
-                        resultDiv.style.color = '#34d399';
-                        resultDiv.style.display = 'block'; }
+                if (selected) {
+                    const selectedO = parseInt(selected.getAttribute('data-o'));
+                    if (selectedO === correctAnswer) {
+                        score++;
+                        if (resultDiv) {
+                            resultDiv.textContent = '✅ 正确！';
+                            resultDiv.style.color = '#34d399';
+                            resultDiv.style.display = 'block';
+                        }
+                        selected.classList.add('correct');
+                    } else {
+                        if (resultDiv) {
+                            resultDiv.textContent = '❌ 错误！正确答案是 ' + String.fromCharCode(65 + correctAnswer);
+                            resultDiv.style.color = '#ef4444';
+                            resultDiv.style.display = 'block';
+                        }
+                        selected.classList.add('wrong');
+                        // 高亮正确答案
+                        const correctOpt = card.querySelector(`.exam-option[data-o="${correctAnswer}"]`);
+                        if (correctOpt) correctOpt.classList.add('correct');
+                    }
                 } else {
-                    if (resultDiv) { resultDiv.textContent = '❌ 错误! 正确答案是 ' + String.fromCharCode(65 +
-                            correct);
-                        resultDiv.style.color = '#ef4444';
-                        resultDiv.style.display = 'block'; }
+                    if (resultDiv) {
+                        resultDiv.textContent = '⚠ 未作答';
+                        resultDiv.style.color = '#f59e0b';
+                        resultDiv.style.display = 'block';
+                    }
                 }
+                // 禁用所有选项
                 card.querySelectorAll('.exam-option').forEach(o => o.style.pointerEvents = 'none');
             });
-            showToast(`得分：${score}/${total} (${Math.round(score/total*100)}%)`, score / total >= 0.6 ? 'success' :
-                'error');
+            const percentage = Math.round((score / total) * 100);
+            showToast(`考试完成！得分：${score}/${total} (${percentage}%)`, percentage >= 60 ? 'success' : 'error');
         }
 
-        // ==================== AI 生成工作任务 ====================
-        async function generateTasksFromAPI() {
-            const topic = document.getElementById('learningTopicInput')?.value?.trim();
-            if (!topic) { showToast('请输入学习内容', 'error'); return; }
-            document.getElementById('taskList').innerHTML =
-                '<p style="color:var(--text-muted);">AI 正在根据你的学习内容生成任务...</p>';
-            const roleNames = { fullstack: '全栈开发', qa: '普通测试', sdet: '测试开发' };
-            const role = roleNames[APP_STATE.workRole] || '开发';
-            const prompt =
-                `你是一位${role}团队的技术主管。请根据学习者正在学习的主题"${topic}"，为ta安排今日的4项工作任务。这些任务应该紧密结合该主题，难度递进。请严格按以下JSON格式输出：["任务1","任务2","任务3","任务4"]`;
+        // ==================== 仪表盘聊天 ====================
+        function sendDashChat() {
+            const input = document.getElementById('dashChatInput');
+            const chatArea = document.getElementById('dashChat');
+            if (!input || !chatArea) return;
+            const msg = input.value.trim();
+            if (!msg) return;
+            // 用户消息
+            chatArea.innerHTML += `<div class="chat-msg user">${escapeHtml(msg)}</div>`;
+            input.value = '';
+            // AI回复
+            setTimeout(() => {
+                const replies = [
+                    '这是个好问题！根据最新的文档，React 18 的并发特性可以显著提升用户体验。',
+                    '建议你查看官方文档中关于 Suspense 的部分，那里有详细解释。',
+                    '对于测试方面，我推荐使用 Playwright 进行端到端测试，它支持多浏览器。',
+                    '全栈开发中，建议先掌握前后端基础，再逐步深入到 DevOps 领域。',
+                ];
+                const reply = replies[Math.floor(Math.random() * replies.length)];
+                chatArea.innerHTML += `<div class="chat-msg ai">${reply}</div>`;
+                chatArea.scrollTop = chatArea.scrollHeight;
+            }, 600 + Math.random() * 800);
+        }
+        document.getElementById('dashChatInput')?.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') sendDashChat();
+        });
 
-            const result = await callAI([{ role: 'user', content: prompt }]);
-            if (!result) { document.getElementById('taskList').innerHTML =
-                '<p style="color:var(--text-muted);">生成失败，请检查 API 配置</p>'; return; }
-            try {
-                const jsonStr = result.replace(/```json|```/g, '').trim();
-                const tasks = JSON.parse(jsonStr);
-                document.getElementById('taskList').innerHTML = tasks.map(t =>
-                    `<div style="padding:10px;border-bottom:1px solid var(--border-color);font-size:13px;">🔨 ${escapeHtml(t)}</div>`
-                    ).join('');
-            } catch (e) {
-                document.getElementById('taskList').innerHTML = '<p style="color:var(--text-muted);">格式解析失败</p>';
-            }
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
         }
 
-        // ==================== 在线实操（真实 JDoodle API） ====================
-        async function runPracticeCode() {
-            const code = document.getElementById('practiceCodeArea')?.value?.trim();
-            if (!code) { showToast('请先编写代码', 'error'); return; }
-            const lang = document.getElementById('practiceLangSelect')?.value || 'javascript';
-            const outputDiv = document.getElementById('practiceOutput');
-            outputDiv.style.display = 'block';
-            outputDiv.textContent = '⏳ 正在云端编译运行...';
-            await executeCodeJDoodle(code, lang, outputDiv);
-        }
-
-        async function runCodeCloud() {
-            const code = window.monacoEditor ? window.monacoEditor.getValue().trim() : '';
-            if (!code) { showToast('请先编写代码', 'error'); return; }
+        // ==================== 代码运行模拟 ====================
+        function runCode() {
+            const outputEl = document.getElementById('codeOutput');
+            if (!outputEl) return;
+            outputEl.style.display = 'block';
             const lang = document.getElementById('languageSelect')?.value || 'javascript';
-            const outputDiv = document.getElementById('codeOutput');
-            outputDiv.style.display = 'block';
-            outputDiv.textContent = '⏳ 正在云端编译运行...';
-            await executeCodeJDoodle(code, lang, outputDiv);
+            const outputs = {
+                javascript: '> Hello, DevSmart!\n> 代码运行成功！\n> 输出: "React 18 Concurrent Mode activated."',
+                typescript: '> TypeScript 编译通过 ✅\n> 类型检查完成，0 errors\n> 运行结果: [1,2,3,4,5]',
+                python: '>>> Python 3.11 执行中...\n>>> Hello World!\n>>> 数据处理完成，共1000条记录',
+                java: '> javac Main.java\n> java Main\n> Build successful\n> Output: Spring Boot started on port 8080',
+                go: '> go run main.go\n> Server listening on :3000\n> Goroutines: 4 active',
+                rust: '> cargo run\n> Compiling...\n> Finished dev build\n> Hello from Rust!',
+            };
+            outputEl.textContent = outputs[lang] || outputs['javascript'];
+            showToast('代码运行完成 ✅', 'success');
         }
 
-        async function executeCodeJDoodle(code, lang, outputDiv) {
-            const clientId = API_CONFIG.jdoodleId;
-            const clientSecret = API_CONFIG.jdoodleSecret;
-            if (!clientId || !clientSecret) {
-                outputDiv.textContent = '❌ 请先在 API 配置面板中填入 JDoodle Client ID 和 Secret';
-                showToast('请配置 JDoodle API 密钥', 'error');
-                return;
-            }
-            try {
-                const res = await fetch('https://api.jdoodle.com/v1/execute', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        clientId: clientId,
-                        clientSecret: clientSecret,
-                        script: code,
-                        language: lang,
-                        versionIndex: '0',
-                    }),
-                });
-                const data = await res.json();
-                outputDiv.textContent = data.output || data.error || '运行完成，无输出';
-                if (data.error) outputDiv.style.color = '#ef4444';
-                else outputDiv.style.color = '#34d399';
-                showToast('云端运行完成 ✅', 'success');
-            } catch (e) {
-                outputDiv.textContent = '网络错误：' + e.message;
-                outputDiv.style.color = '#ef4444';
-                showToast('代码执行失败', 'error');
+        function changeLanguage() {
+            const lang = document.getElementById('languageSelect')?.value;
+            if (window.monacoEditor && lang) {
+                const langMap = {
+                    javascript: 'javascript',
+                    typescript: 'typescript',
+                    python: 'python',
+                    java: 'java',
+                    go: 'go',
+                    rust: 'rust',
+                };
+                const monacoLang = langMap[lang] || 'javascript';
+                monaco.editor.setModelLanguage(window.monacoEditor.getModel(), monacoLang);
+                showToast(`语言已切换至 ${lang}`, 'info');
             }
         }
 
-        // ==================== 兼职广场（RemoteJobs API） ====================
-        async function fetchRealJobs() {
-            const jobList = document.getElementById('jobList');
-            jobList.innerHTML = '<p style="color:var(--text-muted);">正在从 RemoteJobs API 获取最新岗位...</p>';
-            try {
-                const res = await fetch('https://remotejobs.org/api/v1/jobs?category=programming&limit=8&type=freelance');
-                const data = await res.json();
-                if (!data.data?.length) { jobList.innerHTML =
-                    '<p style="color:var(--text-muted);">暂无岗位数据</p>'; return; }
-                jobList.innerHTML = data.data.map(j => `
-                <div class="job-card" onclick="window.open('${j.url}')">
-                  <div style="width:44px;height:44px;border-radius:6px;background:rgba(59,130,246,0.2);display:flex;align-items:center;justify-content:center;font-weight:700;color:#60a5fa;">${(j.company?.name||'?')[0]}</div>
-                  <div style="flex:1;"><strong>${escapeHtml(j.title)}</strong><p style="font-size:11px;color:var(--text-muted);">${escapeHtml(j.company?.name||'')} · ${escapeHtml(j.location||'远程')} · ${escapeHtml(j.type||'')}</p></div>
-                  <span class="tag tag-green">真实岗位</span>
-                </div>`).join('');
-                document.getElementById('statJobs').textContent = data.pagination?.total || '--';
-            } catch (e) { jobList.innerHTML = '<p style="color:var(--text-muted);">获取失败，请检查网络连接</p>'; }
-        }
-
-        // ==================== 仪表盘统计 ====================
-        function updateDashboardStats() {
-            if (API_CONFIG.githubToken) document.getElementById('statAI').textContent = '✅';
-            if (API_CONFIG.jdoodleId) document.getElementById('statCompiler').textContent = '✅';
-        }
-
-        // ==================== Monaco Editor ====================
-        require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs' } });
+        // ==================== Monaco Editor 初始化 ====================
+        let monacoEditorInstance = null;
+        require.config({
+            paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs' }
+        });
         require(['vs/editor/editor.main'], function() {
-            const el = document.getElementById('monaco-editor');
-            if (!el) return;
-            window.monacoEditor = monaco.editor.create(el, {
-                value: `// DevSmart v1.0.2 - 云端真实运行\nfunction greet(name) {\n  console.log("Hello, " + name + "!");\n}\n\ngreet("开发者");\n\n// 点击下方"云端运行"按钮\n// 代码将在 JDoodle 真实环境中编译执行`,
+            const editorEl = document.getElementById('monaco-editor');
+            if (!editorEl) return;
+            monacoEditorInstance = monaco.editor.create(editorEl, {
+                value: `// 欢迎使用 DevSmart 在线编辑器 🚀\n// 支持 JavaScript, TypeScript, Python, Java, Go, Rust\n\nfunction greet(name) {\n  console.log("Hello, " + name + "!");\n  console.log("Welcome to DevSmart Platform v1.0.1");\n}\n\ngreet("开发者");\n\n// 提示：学习模式下可一边看视频一边在此输入练习`,
                 language: 'javascript',
                 theme: 'vs-dark',
                 fontSize: 13,
-                fontFamily: "'JetBrains Mono', monospace",
+                fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
                 minimap: { enabled: false },
                 automaticLayout: true,
                 scrollBeyondLastLine: false,
+                lineNumbers: 'on',
+                renderLineHighlight: 'line',
+                cursorBlinking: 'smooth',
+                smoothScrolling: true,
+                padding: { top: 12, bottom: 12 },
             });
-            setTimeout(() => window.monacoEditor.layout(), 300);
+            window.monacoEditor = monacoEditorInstance;
+            // 初始布局
+            setTimeout(() => monacoEditorInstance.layout(), 300);
         });
 
-        window.addEventListener('resize', () => { if (window.monacoEditor) setTimeout(() => window.monacoEditor
-                .layout(), 150); });
+        // 窗口大小变化时刷新编辑器
+        window.addEventListener('resize', () => {
+            if (window.monacoEditor) {
+                setTimeout(() => window.monacoEditor.layout(), 150);
+            }
+        });
 
         // ==================== 初始化 ====================
         function init() {
-            loadConfig();
-            updateDashboardStats();
+            updateWorkClockDisplay();
+            // 默认显示仪表盘
             switchPage('dashboard');
-            console.log('🚀 DevSmart Platform v1.0.2 已就绪');
-            console.log('✅ 已接入 GitHub Models API（AI 对话/出题/任务生成）');
-            console.log('✅ 已接入 YouTube Data API（视频/课程搜索）');
-            console.log('✅ 已接入 JDoodle API（云端代码编译运行）');
-            console.log('✅ 已接入 RemoteJobs API（真实兼职岗位）');
+            console.log('🚀 DevSmart Platform v1.0.1 已就绪');
+            console.log('📦 可通过GitHub打包部署');
+            console.log('🎓 学习模式 | 💼 上班模式 | 🤖 AI考试 | 🛠 实操 | 💼 兼职广场');
         }
+
+        // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', init);
+
+        // ==================== 全局函数暴露 ====================
+        window.switchPage = switchPage;
+        window.showToast = showToast;
+        window.sendDashChat = sendDashChat;
+        window.generateExam = generateExam;
+        window.selectExamOption = selectExamOption;
+        window.submitExam = submitExam;
+        window.runCode = runCode;
+        window.changeLanguage = changeLanguage;
+        window.startWorkClock = startWorkClock;
+        window.stopWorkClock = stopWorkClock;
     </script>
 </body>
 </html>
