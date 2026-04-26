@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>DevSmart v4.0.1 · 职业化学习平台</title>
+    <title>DevSmart v4.1.2 · 职业化学习平台</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
@@ -33,9 +33,10 @@
             --muted: #64748b;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { background:var(--bg); color:var(--text); font-family: 'Inter', system-ui, -apple-system, sans-serif; height:100vh; display:flex; overflow:hidden; transition: background 0.3s; }
+        body { background:var(--bg); color:var(--text); font-family: 'Inter', system-ui, sans-serif; height:100vh; display:flex; overflow:hidden; transition: background 0.3s; }
         .hidden { display:none !important; }
 
+        /* 侧边栏 */
         .sidebar {
             width: var(--sidebar-width); background: var(--glass); backdrop-filter: blur(12px);
             border-right:1px solid var(--border); display:flex; flex-direction:column; padding:24px 16px; flex-shrink:0;
@@ -53,11 +54,11 @@
         .nav-item i { width:20px; font-size:15px; }
         .nav-item:hover, .nav-item.active { background:#1e293b; color:#fff; transform: translateX(4px); }
 
+        /* 主区域 */
         .main { flex:1; display:flex; flex-direction:column; min-width:0; }
         .topbar {
             height: var(--topbar-height); padding:0 24px; background: var(--glass); backdrop-filter: blur(10px);
-            border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px; flex-shrink:0;
-            flex-wrap: wrap;
+            border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px; flex-shrink:0; flex-wrap: wrap;
         }
         .mode-switch, .role-switch, .level-switch { display:flex; background:var(--glass); border-radius:30px; padding:4px; gap:4px; }
         .mode-btn, .role-btn, .level-btn {
@@ -69,8 +70,7 @@
             background: linear-gradient(135deg, #3b82f6, #2563eb);
             color:#fff; border:none; padding:8px 18px;
             border-radius:10px; cursor:pointer; font-size:14px; display:inline-flex; align-items:center; gap:6px;
-            transition: all 0.2s;
-            box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+            transition: all 0.2s; box-shadow: 0 4px 12px rgba(59,130,246,0.3);
         }
         .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(59,130,246,0.4); }
         .btn-outline { background:transparent; border:1px solid var(--border); color:var(--text); box-shadow: none; }
@@ -94,10 +94,13 @@
         @keyframes slideIn { from { transform: translateX(100px); opacity:0; } to { transform: translateX(0); opacity:1; } }
 
         .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:20px; }
-        .progress-bar { height:10px; background:var(--border); border-radius:8px; overflow:hidden; }
-        .progress-fill { height:100%; border-radius:8px; background:var(--blue); transition: width 0.5s; }
-        .flex-row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-        .tag { padding:4px 10px; border-radius:20px; font-size:11px; background:rgba(59,130,246,0.15); color:#60a5fa; }
+        .phase-card { margin-bottom:16px; }
+        .phase-header { display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:600; margin-bottom:8px; }
+        .phase-tasks { padding-left:24px; display:none; }
+        .phase-tasks.open { display:block; }
+        .task-item { display:flex; align-items:center; gap:8px; padding:4px 0; }
+        .task-check { cursor:pointer; }
+
         .forum-post { padding:12px; border-bottom:1px solid var(--border); }
         .task-step { padding:12px 16px; border-left:3px solid var(--blue); background:#1e293b; margin:8px 0; border-radius:8px; }
         .exam-option { display:block; padding:10px 16px; margin:6px 0; border-radius:8px; cursor:pointer; border:1px solid var(--border); transition: 0.15s; }
@@ -107,7 +110,6 @@
             background: rgba(11, 17, 25, 0.8); border:1px solid var(--border); border-radius:8px;
             padding:10px 14px; color:var(--text); font-family:inherit; outline:none;
         }
-        .toggle-theme { cursor:pointer; margin-left:8px; }
     </style>
 </head>
 <body>
@@ -122,7 +124,7 @@
     </div>
     <button class="login-btn" id="loginBtn"><i class="fa-brands fa-github"></i> GitHub 登录</button>
     <nav id="sidebarNav" style="margin-top: 20px;"></nav>
-    <div style="margin-top:auto; font-size:11px; color:var(--muted);">v4.0.1</div>
+    <div style="margin-top:auto; font-size:11px; color:var(--muted);">v4.1.2</div>
 </aside>
 
 <div class="main">
@@ -144,7 +146,7 @@
         </div>
         <div style="margin-left:auto; display:flex; gap:8px; align-items:center;">
             <button class="btn btn-outline btn-sm" id="configBtn"><i class="fa-solid fa-gear"></i> 设置</button>
-            <span class="toggle-theme" id="themeToggle" title="切换浅色/深色">🌓</span>
+            <span id="themeToggle" style="cursor:pointer; font-size:18px;" title="切换浅色/深色">🌓</span>
         </div>
     </header>
 
@@ -152,19 +154,19 @@
 </div>
 
 <!-- 设置面板 -->
-<div id="configPanel" class="hidden" style="position:fixed; top:70px; right:20px; width:360px; background:var(--glass); backdrop-filter:blur(16px); border:1px solid var(--border); border-radius:16px; padding:24px; z-index:99; max-height:80vh; overflow-y:auto;">
+<div id="configPanel" class="hidden" style="position:fixed; top:70px; right:20px; width:360px; background:var(--glass); backdrop-filter:blur(16px); border:1px solid var(--border); border-radius:16px; padding:24px; z-index:999; max-height:80vh; overflow-y:auto;">
     <span style="position:absolute; top:12px; right:16px; cursor:pointer;" onclick="document.getElementById('configPanel').classList.add('hidden')">✕</span>
     <h4>🔑 设置</h4>
     <div class="flex-row" style="margin:12px 0;">
         <button class="btn btn-sm" onclick="switchLang('zh')">中文</button>
         <button class="btn btn-sm" onclick="switchLang('en')">English</button>
-        <button class="btn btn-sm" onclick="toggleTheme()">🌓 浅/深色</button>
+        <button class="btn btn-sm" onclick="toggleTheme()">🌓 切换主题</button>
     </div>
     <h5>AI 模型配置</h5>
     <label>默认模型</label>
     <select id="aiModelSelect" style="width:100%; margin-bottom:8px;">
         <option value="github">GitHub Models (GPT-4o)</option>
-        <option value="openai">OpenAI (自定义)</option>
+        <option value="openai">OpenAI</option>
         <option value="deepseek">DeepSeek</option>
         <option value="tongyi">通义千问</option>
     </select>
@@ -173,8 +175,8 @@
     <label>API Endpoint (可选)</label>
     <input type="text" id="aiEndpoint" placeholder="留空则使用默认">
     <label>模型名称 (可选)</label>
-    <input type="text" id="aiModelName" placeholder="如 gpt-4o, deepseek-chat">
-    <label>GitHub Token (用于 GitHub 登录)</label>
+    <input type="text" id="aiModelName" placeholder="如 gpt-4o">
+    <label>GitHub Token</label>
     <input type="password" id="ghToken" placeholder="ghp_...">
     <label>YouTube API Key</label>
     <input type="password" id="ytKey" placeholder="AIza...">
@@ -184,7 +186,7 @@
 <div id="toastContainer"></div>
 
 <script>
-    // ====================== 全局状态 & 多语言 ======================
+    // ====================== 全局状态 ======================
     const state = {
         mode: 'learn',
         role: 'fullstack',
@@ -193,43 +195,32 @@
         currentPage: 'dashboard',
         lang: 'zh',
         theme: 'dark',
-        aiConfig: { provider: 'github', apiKey: '', endpoint: '', modelName: '' },
-        clockSeconds: 0,
+        clockRemaining: 28800,
         clockInterval: null,
-        clockRemaining: 28800,  // 8小时
     };
 
     const texts = {
         zh: {
             dashboard: '仪表盘', learnCenter: '学习中心', aiExam: 'AI考试', forum: '论坛', tools: '工具',
             roadmap: '学习路线', workCheckin: '上班打卡', workTasks: '今日任务', projectPractice: '项目实操',
-            back: '← 返回', save: '保存', search: '搜索', addPost: '发布', analyze: '分析',
-            generateTasks: 'AI 生成任务', generateExam: '生成试卷', submitExam: '提交答卷',
-            startClock: '开始打卡', pauseClock: '暂停', remaining: '剩余时间', passed: '已过时间',
-            aiAnalyzing: 'AI 分析中...', generating: '生成中...', loadFailed: '加载失败',
+            back: '← 返回', save: '保存', search: '搜索', analyze: '分析',
+            generateTasks: 'AI 生成任务', startClock: '开始打卡', pauseClock: '暂停', remaining: '剩余时间',
             freeCourses: '免费职业课程', clickToOpen: '点击访问',
         },
         en: {
             dashboard: 'Dashboard', learnCenter: 'Learn Center', aiExam: 'AI Exam', forum: 'Forum', tools: 'Tools',
-            roadmap: 'Roadmap', workCheckin: 'Check-in', workTasks: 'Daily Tasks', projectPractice: 'Project Practice',
-            back: '← Back', save: 'Save', search: 'Search', addPost: 'Post', analyze: 'Analyze',
-            generateTasks: 'Generate Tasks', generateExam: 'Generate Exam', submitExam: 'Submit',
-            startClock: 'Start', pauseClock: 'Pause', remaining: 'Remaining', passed: 'Elapsed',
-            aiAnalyzing: 'Analyzing...', generating: 'Generating...', loadFailed: 'Failed',
+            roadmap: 'Roadmap', workCheckin: 'Check-in', workTasks: 'Tasks', projectPractice: 'Projects',
+            back: '← Back', save: 'Save', search: 'Search', analyze: 'Analyze',
+            generateTasks: 'Generate Tasks', startClock: 'Start', pauseClock: 'Pause', remaining: 'Remaining',
             freeCourses: 'Free Courses', clickToOpen: 'Visit',
         }
     };
-
     function t(key) { return texts[state.lang]?.[key] || key; }
 
-    // ====================== 配置管理 ======================
-    const CONFIG_KEY = 'ds_config_v4.0.1';
-    let config = {
-        githubToken: '', youtubeKey: '',
-        aiProvider: 'github', aiApiKey: '', aiEndpoint: '', aiModelName: '',
-        lang: 'zh', theme: 'dark',
-    };
+    const CONFIG_KEY = 'ds_config_v4.1.2';
+    let config = { githubToken:'', youtubeKey:'', aiProvider:'github', aiApiKey:'', aiEndpoint:'', aiModelName:'', lang:'zh', theme:'dark' };
 
+    // ====================== 配置加载/保存 ======================
     function loadConfig() {
         const saved = localStorage.getItem(CONFIG_KEY);
         if (saved) config = JSON.parse(saved);
@@ -239,15 +230,11 @@
         document.getElementById('aiApiKey').value = config.aiApiKey || '';
         document.getElementById('aiEndpoint').value = config.aiEndpoint || '';
         document.getElementById('aiModelName').value = config.aiModelName || '';
-
         state.lang = config.lang || 'zh';
         state.theme = config.theme || 'dark';
-        document.body.classList.toggle('light-mode', state.theme === 'light');
-        document.getElementById('themeToggle').textContent = state.theme === 'dark' ? '☀️' : '🌙';
-
+        applyTheme();
         if (config.githubToken) fetchGitHubUser();
     }
-
     function saveAllConfig() {
         config.githubToken = document.getElementById('ghToken').value.trim();
         config.youtubeKey = document.getElementById('ytKey').value.trim();
@@ -258,441 +245,264 @@
         config.lang = state.lang;
         config.theme = state.theme;
         localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
-        toast(t('save') + ' ✅');
+        toast('配置已保存');
         fetchGitHubUser();
         document.getElementById('configPanel').classList.add('hidden');
     }
-
+    function applyTheme() {
+        document.body.classList.toggle('light-mode', state.theme === 'light');
+        document.getElementById('themeToggle').textContent = state.theme === 'dark' ? '☀️' : '🌙';
+    }
+    window.toggleTheme = () => {
+        state.theme = state.theme === 'dark' ? 'light' : 'dark';
+        applyTheme();
+    };
     window.switchLang = (lang) => {
         state.lang = lang;
         renderAll();
     };
-
-    window.toggleTheme = () => {
-        state.theme = state.theme === 'dark' ? 'light' : 'dark';
-        document.body.classList.toggle('light-mode', state.theme === 'light');
-        document.getElementById('themeToggle').textContent = state.theme === 'dark' ? '☀️' : '🌙';
-    };
-
     async function fetchGitHubUser() {
         if (!config.githubToken) return;
         try {
-            const res = await fetch('https://api.github.com/user', {
-                headers: { Authorization: `Bearer ${config.githubToken}` }
-            });
-            if (res.ok) state.user = await res.json();
-            else state.user = null;
+            const res = await fetch('https://api.github.com/user', { headers: { Authorization: `Bearer ${config.githubToken}` } });
+            if (res.ok) state.user = await res.json(); else state.user = null;
         } catch { state.user = null; }
         updateUserUI();
     }
-
     function updateUserUI() {
-        const avatar = document.getElementById('userAvatar');
-        const name = document.getElementById('userName');
-        const status = document.getElementById('userStatus');
-        if (state.user) {
-            avatar.src = state.user.avatar_url;
-            name.textContent = state.user.login;
-            status.textContent = 'Online';
-        } else {
-            avatar.src = 'https://via.placeholder.com/44';
-            name.textContent = 'Guest';
-            status.textContent = 'Offline';
-        }
+        document.getElementById('userAvatar').src = state.user ? state.user.avatar_url : 'https://via.placeholder.com/44';
+        document.getElementById('userName').textContent = state.user ? state.user.login : '未登录';
+        document.getElementById('userStatus').textContent = state.user ? 'Online' : 'Offline';
     }
 
     // ====================== UI 渲染 ======================
-    function renderAll() {
-        renderSidebar();
-        renderCurrentPage();
-    }
-
-    function navigateTo(page) {
-        state.currentPage = page;
-        renderCurrentPage();
-        document.getElementById('contentArea').scrollTop = 0;
-    }
+    function renderAll() { renderSidebar(); renderCurrentPage(); }
+    function navigateTo(page) { state.currentPage = page; renderCurrentPage(); document.getElementById('contentArea').scrollTop = 0; }
 
     function renderSidebar() {
-        const nav = document.getElementById('sidebarNav');
         const items = state.mode === 'learn' ? [
-            { page: 'dashboard', icon: 'fa-chart-pie', label: t('dashboard') },
-            { page: 'learncenter', icon: 'fa-graduation-cap', label: t('learnCenter') },
-            { page: 'aiexam', icon: 'fa-file-circle-check', label: t('aiExam') },
-            { page: 'forum', icon: 'fa-comments', label: t('forum') },
-            { page: 'tools', icon: 'fa-toolbox', label: t('tools') },
-            { page: 'roadmap', icon: 'fa-road', label: t('roadmap') },
+            { page:'dashboard', icon:'fa-chart-pie', label:t('dashboard') },
+            { page:'learncenter', icon:'fa-graduation-cap', label:t('learnCenter') },
+            { page:'aiexam', icon:'fa-file-circle-check', label:t('aiExam') },
+            { page:'forum', icon:'fa-comments', label:t('forum') },
+            { page:'tools', icon:'fa-toolbox', label:t('tools') },
+            { page:'roadmap', icon:'fa-road', label:t('roadmap') },
         ] : [
-            { page: 'dashboard', icon: 'fa-chart-pie', label: t('dashboard') },
-            { page: 'workcheckin', icon: 'fa-clock', label: t('workCheckin') },
-            { page: 'worktasks', icon: 'fa-list-check', label: t('workTasks') },
-            { page: 'projectpractice', icon: 'fa-laptop-code', label: t('projectPractice') },
-            { page: 'forum', icon: 'fa-comments', label: t('forum') },
-            { page: 'tools', icon: 'fa-toolbox', label: t('tools') },
+            { page:'dashboard', icon:'fa-chart-pie', label:t('dashboard') },
+            { page:'workcheckin', icon:'fa-clock', label:t('workCheckin') },
+            { page:'worktasks', icon:'fa-list-check', label:t('workTasks') },
+            { page:'projectpractice', icon:'fa-laptop-code', label:t('projectPractice') },
+            { page:'forum', icon:'fa-comments', label:t('forum') },
+            { page:'tools', icon:'fa-toolbox', label:t('tools') },
         ];
-        nav.innerHTML = items.map(item => `
-            <div class="nav-item ${state.currentPage===item.page?'active':''}" data-page="${item.page}">
-                <i class="fa-solid ${item.icon}"></i> ${item.label}
-            </div>
-        `).join('');
-        nav.querySelectorAll('.nav-item').forEach(el => {
-            el.addEventListener('click', (e) => navigateTo(el.dataset.page));
-        });
+        const nav = document.getElementById('sidebarNav');
+        nav.innerHTML = items.map(i => `<div class="nav-item ${state.currentPage===i.page?'active':''}" data-page="${i.page}"><i class="fa-solid ${i.icon}"></i> ${i.label}</div>`).join('');
+        nav.querySelectorAll('.nav-item').forEach(el => el.addEventListener('click', (e) => navigateTo(el.dataset.page)));
     }
 
     function renderCurrentPage() {
         const container = document.getElementById('contentArea');
         container.innerHTML = '';
-        const page = state.currentPage;
-        switch (page) {
-            case 'dashboard': renderDashboard(container); break;
-            case 'learncenter': renderLearnCenter(container); break;
-            case 'aiexam': renderAIExam(container); break;
-            case 'forum': renderForum(container); break;
-            case 'tools': renderTools(container); break;
-            case 'roadmap': renderRoadmapPage(container); break;
-            case 'workcheckin': renderWorkCheckin(container); break;
-            case 'worktasks': renderWorkTasks(container); break;
-            case 'projectpractice': renderProjectPractice(container); break;
-            default: renderDashboard(container);
-        }
+        const p = state.currentPage;
+        if (p === 'dashboard') renderDashboard(container);
+        else if (p === 'learncenter') renderLearnCenter(container);
+        else if (p === 'aiexam') renderAIExam(container);
+        else if (p === 'forum') renderForum(container);
+        else if (p === 'tools') renderTools(container);
+        else if (p === 'roadmap') renderRoadmapPage(container);
+        else if (p === 'workcheckin') renderWorkCheckin(container);
+        else if (p === 'worktasks') renderWorkTasks(container);
+        else if (p === 'projectpractice') renderProjectPractice(container);
     }
 
-    // ====================== 页面渲染函数 ======================
-    function renderDashboard(container) {
-        container.innerHTML = `
-            <h2>📊 ${t('dashboard')}</h2>
-            <div class="grid-2">
-                <div class="card">
-                    <h4>📅 今日学习计划</h4>
-                    <div id="dailyPlanList"></div>
-                    <div class="flex-row" style="margin-top:12px;">
-                        <input type="text" id="newPlanInput" placeholder="添加任务...">
-                        <button class="btn btn-sm" onclick="addDailyPlan()">+</button>
-                    </div>
-                </div>
-                <div class="card">
-                    <h4>🤖 AI 老师</h4>
-                    <textarea id="aiTeacherCode" style="width:100%; height:100px;" placeholder="粘贴代码分析错误..."></textarea>
-                    <button class="btn btn-sm" onclick="analyzeCode()" style="margin-top:8px;">${t('analyze')}</button>
-                    <div id="aiOutput" style="margin-top:8px; white-space:pre-wrap;"></div>
-                </div>
-            </div>
-            <div class="card" style="margin-top:20px; cursor:pointer;" onclick="navigateTo('roadmap')">
-                <h4>🗺️ ${t('roadmap')} · ${roleName()} (${levelName()})</h4>
-                <div id="roadmapPreview"></div>
-            </div>
-        `;
-        renderDailyPlan();
-        renderRoadmapPreview();
-    }
-
-    function renderDailyPlan() {
-        const plans = JSON.parse(localStorage.getItem('daily_plans') || '[]');
-        const list = document.getElementById('dailyPlanList');
-        if (list) list.innerHTML = plans.map((p,i) => `<div>☐ ${p} <button onclick="removePlan(${i})" style="background:none;border:none;color:red;">✕</button></div>`).join('');
-    }
-
-    function renderLearnCenter(container) {
-        container.innerHTML = `
-            <div class="back-btn" onclick="navigateTo('dashboard')">${t('back')}</div>
-            <h2>🎓 ${t('learnCenter')}</h2>
-            <div class="grid-2">
-                <div class="card">
-                    <h4>📺 视频课程</h4>
-                    <div class="flex-row"><input id="videoSearchInput" placeholder="搜索课程"><button class="btn btn-sm" onclick="searchCourse()">${t('search')}</button></div>
-                    <div id="courseList" style="max-height:200px; overflow-y:auto;"></div>
-                    <iframe id="videoPlayer" style="height:250px; margin-top:12px;" src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen></iframe>
-                </div>
-                <div class="card">
-                    <h4>📚 ${t('freeCourses')}</h4>
-                    <div id="freeCourses"></div>
-                </div>
-            </div>
-            <div class="card">
-                <h4>💻 跟随练习</h4>
-                <textarea id="codeEditor" style="width:100%; height:180px;">// 练习代码</textarea>
-                <div class="flex-row"><select id="langSelect"><option>javascript</option><option>python3</option></select><button class="btn btn-sm" onclick="runCode()">运行</button></div>
-                <div id="codeOutput" style="white-space:pre-wrap;"></div>
-            </div>
-        `;
-        renderFreeCourses();
-    }
-
-    function renderFreeCourses() {
-        const courses = {
+    // ====================== 路线图（阶段+任务） ======================
+    function getRoadmap() {
+        const maps = {
             fullstack: [
-                { name: 'freeCodeCamp', url: 'https://www.freecodecamp.org/' },
-                { name: 'The Odin Project', url: 'https://www.theodinproject.com/' },
-                { name: 'MDN Web Docs', url: 'https://developer.mozilla.org/' }
+                { phase:'前端基础', tasks:['HTML语义化','CSS布局','JavaScript基础','DOM操作'] },
+                { phase:'前端进阶', tasks:['React/Vue框架','状态管理','路由','前端工程化'] },
+                { phase:'后端开发', tasks:['Node.js/Express','数据库设计','RESTful API','身份认证'] },
+                { phase:'全栈整合', tasks:['前后端联调','部署与CI/CD','性能优化','安全实践'] },
             ],
             sdet: [
-                { name: 'Test Automation University', url: 'https://testautomationu.applitools.com/' },
-                { name: 'Cypress Docs', url: 'https://docs.cypress.io/' },
-                { name: 'Playwright 文档', url: 'https://playwright.dev/' }
+                { phase:'自动化基础', tasks:['Selenium基础','元素定位','Pytest框架','数据驱动'] },
+                { phase:'进阶自动化', tasks:['Playwright','API测试','Mock服务','CI集成'] },
+                { phase:'性能测试', tasks:['JMeter入门','负载测试','性能监控','瓶颈分析'] },
+                { phase:'测试架构', tasks:['测试策略','质量度量','测试平台搭建','DevOps实践'] },
             ],
             qa: [
-                { name: 'ISTQB 基础', url: 'https://www.istqb.org/' },
-                { name: '软件测试教程', url: 'https://www.guru99.com/software-testing.html' }
+                { phase:'测试理论', tasks:['测试流程','黑盒白盒','等价类边界值'] },
+                { phase:'测试设计', tasks:['用例编写','测试计划','缺陷管理工具'] },
+                { phase:'专项测试', tasks:['兼容性测试','移动端测试','安全性测试基础'] },
+                { phase:'测试管理', tasks:['测试进度跟踪','质量报告','团队协作'] },
             ],
             'ai-test': [
-                { name: 'AI 测试入门', url: 'https://www.ministryoftesting.com/' },
-                { name: 'ML 模型评估', url: 'https://developers.google.com/machine-learning/crash-course' }
+                { phase:'AI基础', tasks:['机器学习概念','监督/无监督学习','模型评估指标'] },
+                { phase:'AI测试方法', tasks:['数据质量测试','模型鲁棒性','公平性测试'] },
+                { phase:'自动化测试框架', tasks:['AI测试工具','自动化流水线','持续测试'] },
+                { phase:'MLOps', tasks:['模型部署监控','A/B测试','反馈循环'] },
             ]
         };
-        const list = courses[state.role] || [];
-        const container = document.getElementById('freeCourses');
-        if (container) container.innerHTML = list.map(c => `
-            <div class="card" style="padding:12px; margin:8px 0; cursor:pointer;" onclick="window.open('${c.url}','_blank')">
-                📘 <strong>${c.name}</strong> <small>(${t('clickToOpen')})</small>
-            </div>
-        `).join('');
+        return maps[state.role] || maps.fullstack;
     }
 
     function renderRoadmapPage(container) {
         container.innerHTML = `
             <div class="back-btn" onclick="navigateTo('dashboard')">${t('back')}</div>
-            <h2>🗺️ ${t('roadmap')} · ${roleName()}</h2>
-            <div class="level-switch" style="margin-bottom:16px;">
-                <button class="level-btn ${state.level==='junior'?'active':''}" onclick="setLevel('junior')">初级</button>
-                <button class="level-btn ${state.level==='middle'?'active':''}" onclick="setLevel('middle')">中级</button>
-                <button class="level-btn ${state.level==='senior'?'active':''}" onclick="setLevel('senior')">高级</button>
-            </div>
-            <div id="roadmapSteps"></div>
+            <h2>🗺️ ${roleName()} ${t('roadmap')}</h2>
+            <div id="roadmapContainer"></div>
         `;
-        renderRoadmapSteps();
-        window.toggleRoadmapStep = (index) => {
-            const completed = JSON.parse(localStorage.getItem('roadmap_completed') || '{}');
-            const key = `${state.role}_${index}`;
-            completed[key] = !completed[key];
-            localStorage.setItem('roadmap_completed', JSON.stringify(completed));
-            renderRoadmapSteps();
-        };
+        renderRoadmapContent();
     }
 
-    function renderRoadmapSteps() {
-        const steps = roleRoadmap();
-        const completed = JSON.parse(localStorage.getItem('roadmap_completed') || '{}');
-        const container = document.getElementById('roadmapSteps');
-        if (!container) return;
-        container.innerHTML = steps.map((s, i) => {
-            const key = `${state.role}_${i}`;
-            const done = completed[key];
-            return `<div class="task-step" style="display:flex; justify-content:space-between; align-items:center; opacity:${done?1:0.6};">
-                <span>${i+1}. ${s} ${done ? '✅' : '🔲'}</span>
-                <button class="btn btn-sm" onclick="toggleRoadmapStep(${i})">${done ? '撤销' : '完成'}</button>
+    function renderRoadmapContent() {
+        const roadmap = getRoadmap();
+        const completed = JSON.parse(localStorage.getItem('roadmap_tasks_v4') || '{}');
+        const container = document.getElementById('roadmapContainer');
+        let html = '';
+        roadmap.forEach((phase, phaseIdx) => {
+            const phaseKey = `${state.role}_phase_${phaseIdx}`;
+            const open = localStorage.getItem(phaseKey) === 'open';
+            html += `<div class="card phase-card">
+                <div class="phase-header" onclick="togglePhase('${phaseKey}')">
+                    <i class="fa-solid fa-chevron-${open ? 'down' : 'right'}"></i> ${phase.phase}
+                </div>
+                <div class="phase-tasks ${open ? 'open' : ''}" id="${phaseKey}">
+                    ${phase.tasks.map((task, taskIdx) => {
+                        const taskId = `${state.role}_${phaseIdx}_${taskIdx}`;
+                        const done = completed[taskId];
+                        return `<div class="task-item">
+                            <input type="checkbox" class="task-check" ${done ? 'checked' : ''} onchange="toggleTask('${taskId}', this.checked)">
+                            <span style="${done ? 'text-decoration:line-through; color:var(--muted)' : ''}">${task}</span>
+                        </div>`;
+                    }).join('')}
+                </div>
             </div>`;
-        }).join('');
+        });
+        container.innerHTML = html;
+    }
+
+    window.togglePhase = (key) => {
+        const el = document.getElementById(key);
+        if (!el) return;
+        const open = el.classList.toggle('open');
+        localStorage.setItem(key, open ? 'open' : 'closed');
+        // 刷新图标
+        const icon = el.parentElement.querySelector('.fa-chevron-right, .fa-chevron-down');
+        if (icon) {
+            icon.classList.toggle('fa-chevron-right', !open);
+            icon.classList.toggle('fa-chevron-down', open);
+        }
+    };
+
+    window.toggleTask = (taskId, checked) => {
+        const completed = JSON.parse(localStorage.getItem('roadmap_tasks_v4') || '{}');
+        if (checked) completed[taskId] = true; else delete completed[taskId];
+        localStorage.setItem('roadmap_tasks_v4', JSON.stringify(completed));
+        // 刷新样式
+        const span = event.target.nextElementSibling;
+        if (span) {
+            span.style.textDecoration = checked ? 'line-through' : 'none';
+            span.style.color = checked ? 'var(--muted)' : 'var(--text)';
+        }
+    };
+
+    // ====================== 其他页面（简化，保留核心功能） ======================
+    function renderDashboard(container) {
+        container.innerHTML = `
+            <h2>📊 ${t('dashboard')}</h2>
+            <div class="grid-2">
+                <div class="card"><h4>📅 今日学习计划</h4><div id="dailyPlanList"></div><input id="newPlanInput" placeholder="添加任务"><button class="btn btn-sm" onclick="addDailyPlan()">+</button></div>
+                <div class="card"><h4>🤖 AI 老师</h4><textarea id="aiTeacherCode" style="width:100%;height:100px;"></textarea><button class="btn btn-sm" onclick="analyzeCode()">分析</button><div id="aiOutput"></div></div>
+            </div>
+            <div class="card" style="margin-top:20px; cursor:pointer;" onclick="navigateTo('roadmap')"><h4>🗺️ ${t('roadmap')} · ${roleName()}</h4><div id="roadmapPreview"></div></div>
+        `;
+        renderDailyPlan();
+    }
+
+    function renderDailyPlan() {
+        const plans = JSON.parse(localStorage.getItem('daily_plans')||'[]');
+        document.getElementById('dailyPlanList').innerHTML = plans.map((p,i)=>`<div>☐ ${p} <button onclick="removePlan(${i})">✕</button></div>`).join('');
+    }
+
+    function renderLearnCenter(container) {
+        container.innerHTML = `<div class="back-btn" onclick="navigateTo('dashboard')">${t('back')}</div><h2>🎓 ${t('learnCenter')}</h2>
+            <div class="grid-2"><div class="card"><h4>📺 视频</h4><input id="videoSearchInput"><button onclick="searchCourse()">搜索</button><div id="courseList"></div><iframe id="videoPlayer" src="https://www.youtube.com/embed/dQw4w9WgXcQ" style="height:250px;"></iframe></div>
+            <div class="card"><h4>📚 ${t('freeCourses')}</h4><div id="freeCourses"></div></div></div>`;
+        renderFreeCourses();
+    }
+
+    function renderFreeCourses() {
+        const courses = {
+            fullstack: [{name:'freeCodeCamp',url:'https://www.freecodecamp.org/'},{name:'MDN',url:'https://developer.mozilla.org/'}],
+            sdet: [{name:'Test Automation U',url:'https://testautomationu.applitools.com/'}],
+            qa: [{name:'ISTQB',url:'https://www.istqb.org/'}],
+            'ai-test': [{name:'AI 测试入门',url:'https://www.ministryoftesting.com/'}]
+        };
+        document.getElementById('freeCourses').innerHTML = (courses[state.role]||[]).map(c=>`<div class="card" onclick="window.open('${c.url}')">📘 ${c.name}</div>`).join('');
     }
 
     function renderWorkCheckin(container) {
-        container.innerHTML = `
-            <div class="back-btn" onclick="navigateTo('dashboard')">${t('back')}</div>
-            <h2>⏰ ${t('workCheckin')} (8h)</h2>
-            <div class="card" style="text-align:center;">
-                <div style="font-size:48px; font-weight:bold;" id="clockDisplay">08:00:00</div>
-                <div style="color:var(--muted);">${t('remaining')}</div>
-                <button class="btn" onclick="toggleClock()" id="clockBtn">${t('startClock')}</button>
-                <div id="checkinLog" style="margin-top:16px;"></div>
-            </div>
-        `;
+        container.innerHTML = `<div class="back-btn" onclick="navigateTo('dashboard')">${t('back')}</div><h2>⏰ ${t('workCheckin')}</h2>
+            <div class="card"><div style="font-size:48px;" id="clockDisplay">08:00:00</div><div>${t('remaining')}</div>
+            <button class="btn" onclick="toggleClock()" id="clockBtn">${t('startClock')}</button></div>`;
         updateClockDisplay();
     }
 
     function renderWorkTasks(container) {
-        container.innerHTML = `
-            <div class="back-btn" onclick="navigateTo('dashboard')">${t('back')}</div>
-            <h2>📋 ${t('workTasks')}</h2>
-            <div class="card">
-                <button class="btn" onclick="generateWorkTasks()">${t('generateTasks')}</button>
-                <div id="workTaskList" style="margin-top:16px;"></div>
-            </div>
-        `;
+        container.innerHTML = `<div class="back-btn" onclick="navigateTo('dashboard')">${t('back')}</div><h2>📋 ${t('workTasks')}</h2>
+            <button class="btn" onclick="generateWorkTasks()">${t('generateTasks')}</button><div id="workTaskList"></div>`;
     }
 
     function renderProjectPractice(container) {
-        container.innerHTML = `
-            <div class="back-btn" onclick="navigateTo('dashboard')">${t('back')}</div>
-            <h2>🛠 ${t('projectPractice')}</h2>
-            <div class="card">
-                <button class="btn" onclick="generatePracticeProject()">${t('generateTasks')}</button>
-                <div id="projectSteps" style="margin-top:16px;"></div>
-            </div>
-        `;
+        container.innerHTML = `<div class="back-btn" onclick="navigateTo('dashboard')">${t('back')}</div><h2>🛠 ${t('projectPractice')}</h2>
+            <button class="btn" onclick="generatePractice()">生成项目</button><div id="projectSteps"></div>`;
     }
 
-    // ====================== 辅助函数 ======================
-    function roleName() {
-        const map = { fullstack:'全栈开发', sdet:'测试开发', qa:'测试工程师', 'ai-test':'AI测试' };
-        return map[state.role] || '';
-    }
-    function levelName() {
-        const map = { junior:'初级', middle:'中级', senior:'高级' };
-        return map[state.level] || '';
-    }
-    function roleRoadmap() {
-        const maps = {
-            fullstack: ['HTML/CSS', 'JavaScript', 'React', 'Node.js', '数据库', 'DevOps'],
-            sdet: ['自动化基础', 'Selenium/Playwright', 'CI/CD', '性能测试', '安全测试', '测试架构'],
-            qa: ['测试理论', '用例设计', '缺陷管理', '回归测试', '探索性测试', '测试管理'],
-            'ai-test': ['AI基础', '模型评估', '数据生成', '自动化框架', 'MLOps', 'AI安全']
-        };
-        return maps[state.role] || [];
-    }
+    // ====================== 事件绑定 ======================
+    document.getElementById('configBtn').addEventListener('click', () => {
+        document.getElementById('configPanel').classList.toggle('hidden');
+    });
+    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
 
-    function toast(msg) {
-        const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
-        document.getElementById('toastContainer').appendChild(t);
-        setTimeout(() => t.remove(), 3000);
-    }
+    document.getElementById('modeSwitch').addEventListener('click', e => {
+        const btn = e.target.closest('.mode-btn'); if(!btn) return;
+        document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active'); state.mode = btn.dataset.mode; renderAll();
+    });
+    document.getElementById('roleSwitch').addEventListener('click', e => {
+        const btn = e.target.closest('.role-btn'); if(!btn) return;
+        document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active'); state.role = btn.dataset.role; renderCurrentPage();
+    });
+    document.getElementById('levelSwitch').addEventListener('click', e => {
+        const btn = e.target.closest('.level-btn'); if(!btn) return;
+        document.querySelectorAll('.level-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active'); state.level = btn.dataset.level; renderCurrentPage();
+    });
 
-    // ====================== 打卡逻辑 ======================
+    function toast(msg) { const t=document.createElement('div'); t.className='toast'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),3000); }
+    function roleName() { return { fullstack:'全栈', sdet:'测开', qa:'测试', 'ai-test':'AI测试' }[state.role]; }
+
+    // 打卡
     window.toggleClock = () => {
-        const btn = document.getElementById('clockBtn');
-        if (state.clockInterval) {
-            clearInterval(state.clockInterval);
-            state.clockInterval = null;
-            btn.textContent = t('startClock');
-        } else {
-            if (state.clockRemaining <= 0) state.clockRemaining = 28800;
-            state.clockInterval = setInterval(() => {
-                if (state.clockRemaining > 0) {
-                    state.clockRemaining--;
-                    updateClockDisplay();
-                } else {
-                    clearInterval(state.clockInterval);
-                    state.clockInterval = null;
-                    document.getElementById('clockBtn').textContent = t('startClock');
-                    toast('打卡已完成！');
-                }
-            }, 1000);
-            btn.textContent = t('pauseClock');
+        if (state.clockInterval) { clearInterval(state.clockInterval); state.clockInterval=null; document.getElementById('clockBtn').textContent=t('startClock'); }
+        else {
+            if (state.clockRemaining<=0) state.clockRemaining=28800;
+            state.clockInterval = setInterval(()=>{
+                if (state.clockRemaining>0) { state.clockRemaining--; updateClockDisplay(); }
+                else { clearInterval(state.clockInterval); state.clockInterval=null; document.getElementById('clockBtn').textContent=t('startClock'); }
+            },1000);
+            document.getElementById('clockBtn').textContent=t('pauseClock');
         }
     };
     function updateClockDisplay() {
-        const rem = state.clockRemaining;
-        const h = Math.floor(rem / 3600), m = Math.floor((rem % 3600) / 60), s = rem % 60;
-        const display = document.getElementById('clockDisplay');
-        if (display) display.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        const h=Math.floor(state.clockRemaining/3600), m=Math.floor((state.clockRemaining%3600)/60), s=state.clockRemaining%60;
+        const el=document.getElementById('clockDisplay'); if(el) el.textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
     }
-
-    // ====================== AI 统一调用 ======================
-    async function callAI(messages) {
-        let endpoint, headers, body;
-        const provider = config.aiProvider || 'github';
-        if (provider === 'github') {
-            if (!config.githubToken) { toast('请先配置 GitHub Token'); return null; }
-            endpoint = 'https://models.github.ai/inference/v1/chat/completions';
-            headers = { 'Content-Type':'application/json', 'Authorization':`Bearer ${config.githubToken}` };
-            body = JSON.stringify({ model: 'gpt-4o', messages, max_tokens:600 });
-        } else if (provider === 'openai') {
-            if (!config.aiApiKey) { toast('请填写 OpenAI API Key'); return null; }
-            endpoint = config.aiEndpoint || 'https://api.openai.com/v1/chat/completions';
-            headers = { 'Content-Type':'application/json', 'Authorization':`Bearer ${config.aiApiKey}` };
-            body = JSON.stringify({ model: config.aiModelName || 'gpt-3.5-turbo', messages, max_tokens:600 });
-        } else if (provider === 'deepseek') {
-            if (!config.aiApiKey) { toast('请填写 DeepSeek API Key'); return null; }
-            endpoint = config.aiEndpoint || 'https://api.deepseek.com/v1/chat/completions';
-            headers = { 'Content-Type':'application/json', 'Authorization':`Bearer ${config.aiApiKey}` };
-            body = JSON.stringify({ model: config.aiModelName || 'deepseek-chat', messages, max_tokens:600 });
-        } else if (provider === 'tongyi') {
-            if (!config.aiApiKey) { toast('请填写通义千问 API Key'); return null; }
-            endpoint = config.aiEndpoint || 'https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation';
-            headers = { 'Content-Type':'application/json', 'Authorization':`Bearer ${config.aiApiKey}` };
-            body = JSON.stringify({ model: config.aiModelName || 'qwen-turbo', input:{ messages }, parameters:{ result_format:'message' } });
-        }
-        try {
-            const res = await fetch(endpoint, { method:'POST', headers, body });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const data = await res.json();
-            if (provider === 'tongyi') return data.output?.choices?.[0]?.message?.content || null;
-            return data.choices?.[0]?.message?.content || null;
-        } catch(e) {
-            toast('AI 调用失败');
-            return null;
-        }
-    }
-
-    // ====================== 功能函数 ======================
-    window.analyzeCode = async () => {
-        const code = document.getElementById('aiTeacherCode')?.value.trim();
-        if (!code) return;
-        const out = document.getElementById('aiOutput');
-        out.textContent = t('aiAnalyzing');
-        const reply = await callAI([{ role:'user', content:`作为编程导师，分析以下代码的错误和改进建议：\n${code}` }]);
-        out.textContent = reply || t('loadFailed');
-    };
-
-    window.searchCourse = async () => {
-        if (!config.youtubeKey) return toast('请配置 YouTube Key');
-        const q = document.getElementById('videoSearchInput')?.value.trim();
-        if (!q) return;
-        const list = document.getElementById('courseList');
-        list.innerHTML = t('generating');
-        const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=5&q=${q}+programming&type=video&key=${config.youtubeKey}`);
-        const data = await res.json();
-        list.innerHTML = data.items?.map(v => `<div style="cursor:pointer;" onclick="document.getElementById('videoPlayer').src='https://www.youtube.com/embed/${v.id.videoId}'">🎬 ${v.snippet.title}</div>`).join('') || '无结果';
-    };
-
-    window.generateWorkTasks = async () => {
-        const list = document.getElementById('workTaskList');
-        list.innerHTML = t('generating');
-        const reply = await callAI([{ role:'user', content:`你是一名${roleName()}（${levelName()}）主管，安排今日4项工作任务，JSON数组：[{"title":"标题","desc":"描述"}]` }]);
-        if (!reply) { list.innerHTML = t('loadFailed'); return; }
-        try {
-            const json = reply.replace(/```json|```/g,'').trim();
-            const tasks = JSON.parse(json);
-            list.innerHTML = tasks.map(t => `<div class="task-step"><strong>${t.title}</strong><p>${t.desc}</p></div>`).join('');
-        } catch { list.innerHTML = '解析失败，请重试'; }
-    };
-
-    window.generatePracticeProject = async () => {
-        const container = document.getElementById('projectSteps');
-        container.innerHTML = t('generating');
-        const reply = await callAI([{ role:'user', content:`为${roleName()}（${levelName()}）设计一个5步骤实操项目，JSON：[{"step":1,"title":"步骤","desc":"描述"}]` }]);
-        if (!reply) { container.innerHTML = t('loadFailed'); return; }
-        try {
-            const json = reply.replace(/```json|```/g,'').trim();
-            const steps = JSON.parse(json);
-            container.innerHTML = steps.map(s => `<div class="task-step"><strong>${s.step}. ${s.title}</strong><p>${s.desc}</p></div>`).join('');
-        } catch { container.innerHTML = '解析失败'; }
-    };
-
-    window.setLevel = (lvl) => {
-        state.level = lvl;
-        renderCurrentPage();
-        document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
-        document.querySelector(`[data-level="${lvl}"]`)?.classList.add('active');
-    };
-
-    // ====================== 事件绑定 ======================
-    document.getElementById('modeSwitch').addEventListener('click', (e) => {
-        const btn = e.target.closest('.mode-btn');
-        if (!btn) return;
-        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        state.mode = btn.dataset.mode;
-        renderAll();
-    });
-    document.getElementById('roleSwitch').addEventListener('click', (e) => {
-        const btn = e.target.closest('.role-btn');
-        if (!btn) return;
-        document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        state.role = btn.dataset.role;
-        renderCurrentPage();
-    });
-    document.getElementById('levelSwitch').addEventListener('click', (e) => {
-        const btn = e.target.closest('.level-btn');
-        if (!btn) return;
-        document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        state.level = btn.dataset.level;
-        renderCurrentPage();
-    });
 
     // 初始化
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', ()=>{
         loadConfig();
         renderAll();
         updateClockDisplay();
